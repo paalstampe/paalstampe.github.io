@@ -1,0 +1,150 @@
+/* stam.pe — samme papirretning som Pål's London og Reisekart.
+   Serif kun til navn og titler, ingen skygger, rette hjørner. */
+
+:root {
+  --papir:       #F7F4EE;
+  --kort:        #FFFDF8;
+  --tekst:       #241F19;
+  --dempet:      #6B5D4A;
+  --kant:        #DCD2C0;
+  --kant-lys:    #E0D8C9;
+  --aksent:      #8A5A2B;
+  --aksent-hover:#63401D;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--papir);
+  color: var(--tekst);
+  font-family: 'Work Sans', system-ui, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.side {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 12vh 32px 48px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Hode ---------- */
+
+.hode { padding-bottom: 36px; }
+
+.kicker {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dempet);
+}
+
+.tittel {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.ingress {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--dempet);
+  max-width: 40ch;
+}
+
+/* ---------- Liste ---------- */
+
+.liste {
+  border-top: 1px solid var(--kant);
+  flex: 1 0 auto;
+}
+
+.oppslag {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: baseline;
+  gap: 0 16px;
+  padding: 24px 0 26px;
+  border-bottom: 1px solid var(--kant-lys);
+  color: inherit;
+  text-decoration: none;
+  transition: padding 0.15s;
+}
+
+.oppslag:hover { padding-left: 10px; }
+.oppslag:hover .oppslag-navn,
+.oppslag:hover .pil { color: var(--aksent); }
+.oppslag:focus-visible { outline: 2px solid var(--aksent); outline-offset: 4px; }
+
+.nr {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--dempet);
+}
+
+.innhold { display: flex; flex-direction: column; }
+
+.oppslag-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aksent);
+}
+
+.oppslag-navn {
+  margin-top: 6px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.15;
+  transition: color 0.12s;
+}
+
+.oppslag-notat {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dempet);
+  max-width: 48ch;
+}
+
+.pil {
+  font-size: 22px;
+  color: var(--dempet);
+  transition: color 0.12s;
+}
+
+/* ---------- Fot ---------- */
+
+.fot {
+  padding-top: 40px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dempet);
+}
+
+/* ---------- Mobil ---------- */
+
+@media (max-width: 600px) {
+  .side { padding: 48px 20px 32px; }
+  .tittel { font-size: 40px; }
+  .oppslag { grid-template-columns: 1fr auto; }
+  .nr { display: none; }
+  .oppslag-navn { font-size: 25px; }
+  .oppslag:hover { padding-left: 0; }
+}
