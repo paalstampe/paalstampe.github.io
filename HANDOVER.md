@@ -15,3 +15,5 @@
 **Publisering:** commit + Push origin i GitHub Desktop. HTTPS: Settings → Pages → Enforce HTTPS.
 
 **Språk:** Pål unngår genetiv-apostrof på norsk – «Påls», ikke «Pål's».
+
+**Språk (NO / EN):** språkvalg øverst til høyre. Lagres i localStorage under `byguider-sprak` — samme nøkkel som byguidene, så valget følger med mellom stam.pe og /byguider/. `?lang=en` overstyrer. Reiseplanlegging er bare på norsk (står i den engelske teksten).

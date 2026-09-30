@@ -16,20 +16,23 @@
 <main class="side">
 
   <header class="hode">
-    <p class="kicker">stam.pe</p>
-    <h1 class="tittel">Påls apper</h1>
-    <p class="ingress">Små verktøy for reise og byer, laget for eget bruk.</p>
+    <div class="topp">
+      <p class="kicker">stam.pe</p>
+      <span class="sprakvalg" role="group" data-t-aria="sprak"><button type="button" data-sprak="no" lang="no">NO</button><span class="skille">/</span><button type="button" data-sprak="en" lang="en">EN</button></span>
+    </div>
+    <h1 class="tittel" data-t="tittel">Påls apper</h1>
+    <p class="ingress" data-t="ingress">Små verktøy for reise og byer, laget for eget bruk.</p>
   </header>
 
   <!-- Ny app: kopier en <a class="oppslag"> og endre href, tekst og nummer. -->
-  <nav class="liste" aria-label="Apper">
+  <nav class="liste" aria-label="Apper" data-t-aria="apper">
 
-    <a class="oppslag" href="/byguider/">
+    <a class="oppslag" href="/byguider/" data-lang-lenke>
       <span class="nr">01</span>
       <span class="innhold">
-        <span class="oppslag-kicker">Nabolag &amp; gåturer</span>
-        <span class="oppslag-navn">Påls byguider</span>
-        <span class="oppslag-notat">Gater, torg og strøk verdt en omvei — med noen ruter å gå dem på. London først, Nice og Oslo etter hvert.</span>
+        <span class="oppslag-kicker" data-t="byguiderKicker">Nabolag &amp; gåturer</span>
+        <span class="oppslag-navn" data-t="byguiderNavn">Påls byguider</span>
+        <span class="oppslag-notat" data-t="byguiderNotat">Gater, torg og strøk verdt en omvei — med noen ruter å gå dem på. London, Nice og Oslo.</span>
       </span>
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
@@ -37,9 +40,9 @@
     <a class="oppslag" href="/reiseplanlegging/">
       <span class="nr">02</span>
       <span class="innhold">
-        <span class="oppslag-kicker">Reisekart &amp; reisekalender</span>
-        <span class="oppslag-navn">Reiseplanlegging</span>
-        <span class="oppslag-notat">Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.</span>
+        <span class="oppslag-kicker" data-t="reiseKicker">Reisekart &amp; reisekalender</span>
+        <span class="oppslag-navn" data-t="reiseNavn">Reiseplanlegging</span>
+        <span class="oppslag-notat" data-t="reiseNotat">Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.</span>
       </span>
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
@@ -51,6 +54,72 @@
   </footer>
 
 </main>
+
+<script>
+/* Språk: NO / EN. Samme nøkkel som byguidene (samme domene), så valget følger med dit —
+   og tilbake. ?lang=en i adressen overstyrer (for å dele en engelsk lenke). */
+const NOKKEL = 'byguider-sprak';
+const TEKST = {
+  no: {
+    sprak: 'Språk', apper: 'Apper',
+    tittel: 'Påls apper', ingress: 'Små verktøy for reise og byer, laget for eget bruk.',
+    byguiderKicker: 'Nabolag & gåturer', byguiderNavn: 'Påls byguider',
+    byguiderNotat: 'Gater, torg og strøk verdt en omvei — med noen ruter å gå dem på. London, Nice og Oslo.',
+    reiseKicker: 'Reisekart & reisekalender', reiseNavn: 'Reiseplanlegging',
+    reiseNotat: 'Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.'
+  },
+  en: {
+    sprak: 'Language', apper: 'Apps',
+    tittel: 'Pål’s apps', ingress: 'Small tools for travel and cities, made for my own use.',
+    byguiderKicker: 'Neighbourhoods & walks', byguiderNavn: 'Pål’s city guides',
+    byguiderNotat: 'Streets, squares and neighbourhoods worth a detour — with a few walks to take them in. London, Nice and Oslo.',
+    reiseKicker: 'Travel map & travel calendar', reiseNavn: 'Travel planning',
+    reiseNotat: 'Best time to travel, destination by destination, month by month — around 40 places outside Europe. In Norwegian only.'
+  }
+};
+
+let sprak = (() => {
+  const q = new URLSearchParams(location.search).get('lang');
+  if (q === 'en' || q === 'no') {
+    try { localStorage.setItem(NOKKEL, q); } catch (e) {}
+    return q;
+  }
+  try {
+    const l = localStorage.getItem(NOKKEL);
+    if (l === 'en' || l === 'no') return l;
+  } catch (e) {}
+  return 'no';
+})();
+
+function tegn() {
+  const T = TEKST[sprak];
+  document.documentElement.lang = sprak;
+  document.querySelectorAll('[data-t]').forEach(e => { e.textContent = T[e.dataset.t]; });
+  document.querySelectorAll('[data-t-aria]').forEach(e => { e.setAttribute('aria-label', T[e.dataset.tAria]); });
+  document.querySelectorAll('.sprakvalg [data-sprak]').forEach(b => {
+    b.setAttribute('aria-pressed', b.dataset.sprak === sprak ? 'true' : 'false');
+  });
+  // Lenken til byguidene får ?lang=en, så en delt engelsk lenke holder seg engelsk videre.
+  document.querySelectorAll('[data-lang-lenke]').forEach(a => {
+    const u = new URL(a.getAttribute('href'), location.href);
+    if (sprak === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
+    a.setAttribute('href', u.pathname + u.search);
+  });
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.sprakvalg [data-sprak]');
+  if (!b || b.dataset.sprak === sprak) return;
+  sprak = b.dataset.sprak;
+  try { localStorage.setItem(NOKKEL, sprak); } catch (e) {}
+  const u = new URL(location.href);
+  if (sprak === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
+  history.replaceState(null, '', u);
+  tegn();
+});
+
+tegn();
+</script>
 
 </body>
 </html>

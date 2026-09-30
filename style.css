@@ -37,8 +37,16 @@ html, body {
 
 .hode { padding-bottom: 36px; }
 
-.kicker {
+.topp {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
   margin: 0 0 12px;
+}
+
+.kicker {
+  margin: 0;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -62,6 +70,31 @@ html, body {
   color: var(--dempet);
   max-width: 40ch;
 }
+
+/* Språkvalg NO / EN — samme utseende som i byguidene. */
+.sprakvalg {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--dempet);
+}
+.sprakvalg .skille { margin: 0 2px; }
+.sprakvalg button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--dempet);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 2px 3px 1px;
+  cursor: pointer;
+}
+.sprakvalg button:hover { color: var(--aksent); }
+.sprakvalg button[aria-pressed="true"] { color: var(--tekst); border-bottom-color: var(--aksent); }
+.sprakvalg button:focus-visible { outline: 1px solid var(--aksent); outline-offset: 2px; }
 
 /* ---------- Liste ---------- */
 
@@ -147,4 +180,5 @@ html, body {
   .nr { display: none; }
   .oppslag-navn { font-size: 25px; }
   .oppslag:hover { padding-left: 0; }
+  .sprakvalg button { padding: 6px 5px 3px; }   /* større trykkflate */
 }
