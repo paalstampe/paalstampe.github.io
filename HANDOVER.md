@@ -1,4 +1,4 @@
-# stam.pe – oppsett (26.09.2026)
+# stam.pe – oppsett (02.10.2026)
 
 **Landingsside:** repo `paalstampe/paalstampe.github.io` (lokalt `/Users/palstampe/Documents/GitHub/paalstampe.github.io`). GitHub Pages user site med `CNAME` = `stam.pe`. Filer: `index.html`, `style.css` (papirstil fra app-ene), `CNAME`, `.nojekyll`, `README.md`.
 
@@ -7,6 +7,10 @@
 - https://stam.pe/reiseplanlegging/ ← repo `paalstampe/reiseplanlegging`
 
 **Ny app:** nytt repo med Pages på (branch `main`, root, ingen egen CNAME) → havner på `stam.pe/<repo>`. Repoer med forhåndsvisning av grener (som denne og byguidene) bruker i stedet Pages-kilden «GitHub Actions». Legg til en `<a class="oppslag">`-blokk i landingssidens `index.html`.
+
+**Miniatyrer:** hvert oppslag på landingssiden har et lite bilde av app-ens åpningsside foran navnet, i stedet for nummer (01, 02). Filene ligger i `bilder/` som webp, 360×270 (4:3), og vises som 120×90 på desktop og 76×57 på mobil, med tynn kantlinje og rette hjørner. Byguidene bruker Nice-guiden (`/byguider/nice/`), siden byguide-forsiden er nesten tom. Slik lages et bilde: skjermbilde med viewport 1300×900 og deviceScaleFactor 2, beskjær 1200×900 fra venstre, og skaler ned til 360×270 (Playwright, med canvas som gir webp). Ta nytt bilde når en app endrer utseende merkbart. Ny app trenger også en miniatyr.
+
+**Bunntekst:** «Oslo · Nice · London» nederst er fjernet (02.10.2026).
 
 **DNS:** hos Fastmail (Settings → Domains → stam.pe → Customize DNS). Domenet er registrert hos GoDaddy med Fastmail-navneservere.
 - Egendefinert: 4 × A `@` → 185.199.108–111.153; 4 × AAAA `@` → 2606:50c0:8000–8003::153; CNAME `www` → `paalstampe.github.io`.
