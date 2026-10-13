@@ -4,6 +4,8 @@
 
 **Hjemskjerm-ikon:** `apple-touch-icon.png` (180×180, iOS) og `manifest.webmanifest` med `ikon-192.png`/`ikon-512.png` (Android). Kobber «s» i Playfair Display på #F7F4EE, samme som favicon. Navn under ikonet: «stam.pe» (`apple-mobile-web-app-title`). Åpnes som egen app (`display: standalone`, scope hele stam.pe, så byguider og reiseplanlegging åpnes i samme vindu). iOS henter `/apple-touch-icon.png` også for undersider som ikke har eget ikon.
 
+**Offline:** `sw.js` (service worker, scope hele stam.pe, registreres fra `index.html`) lagrer landingssiden, bildene, ikonene og Google Fonts. Egne filer hentes fra nettet først (lagret kopi uten nett eller etter 4 s), fontene fra lageret. Den rører ikke `byguider/` og `reiseplanlegging/` (`UNNTAK`), som har egne service workers. Nødvendig fordi hjemskjerm-appen «stam.pe» alltid åpner her. Byguidene og reiseplanleggingen virker offline i den appen når de er åpnet der én gang med nett. Ny app med egen service worker skal inn i `UNNTAK`. Ved endret strategi: øk `VERSJON`.
+
 **App-er** (project sites, arver domenet automatisk):
 - https://stam.pe/byguider/ ← repo `paalstampe/byguider`
 - https://stam.pe/reiseplanlegging/ ← repo `paalstampe/reiseplanlegging`
