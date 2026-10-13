@@ -2,6 +2,8 @@
 
 **Landingsside:** repo `paalstampe/paalstampe.github.io` (lokalt `/Users/palstampe/Documents/GitHub/paalstampe.github.io`). GitHub Pages user site med `CNAME` = `stam.pe`. Filer: `index.html`, `style.css` (papirstil fra app-ene), `CNAME`, `.nojekyll`, `README.md`.
 
+**Hjemskjerm-ikon:** `apple-touch-icon.png` (180×180, iOS) og `manifest.webmanifest` med `ikon-192.png`/`ikon-512.png` (Android). Kobber «s» i Playfair Display på #F7F4EE, samme som favicon. Navn under ikonet: «stam.pe» (`apple-mobile-web-app-title`). Åpnes som egen app (`display: standalone`, scope hele stam.pe, så byguider og reiseplanlegging åpnes i samme vindu). iOS henter `/apple-touch-icon.png` også for undersider som ikke har eget ikon.
+
 **App-er** (project sites, arver domenet automatisk):
 - https://stam.pe/byguider/ ← repo `paalstampe/byguider`
 - https://stam.pe/reiseplanlegging/ ← repo `paalstampe/reiseplanlegging`
