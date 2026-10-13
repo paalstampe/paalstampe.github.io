@@ -58,6 +58,19 @@
 </main>
 
 <script>
+/* Offline: sw.js lagrer siden og fontene (se kommentaren der). Fontene meldes inn etter lasting,
+   så de er med også første gang. */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  window.addEventListener('load', () => {
+    Promise.all([navigator.serviceWorker.ready, document.fonts.ready]).then(([reg]) => {
+      const adresser = performance.getEntriesByType('resource').map(e => e.name).filter(u => /^https?:/.test(u));
+      if (reg.active) reg.active.postMessage({ type: 'forhandslast', adresser: adresser });
+    }).catch(() => {});
+  });
+}
+</script>
+<script>
 /* Språk: NO / EN. Samme nøkkel som byguidene (samme domene), så valget følger med dit —
    og tilbake. ?lang=en i adressen overstyrer (for å dele en engelsk lenke). */
 const NOKKEL = 'byguider-sprak';
