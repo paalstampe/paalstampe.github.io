@@ -162,6 +162,40 @@ html, body {
   transition: color 0.12s;
 }
 
+/* ---------- Offline: status per app og «Lagre alt» ---------- */
+
+.oppslag-offline {
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--aksent);
+}
+
+.offline-boks { padding: 22px 0 0; }
+.liste:has(+ .offline-boks:not([hidden])) { flex-grow: 0; }   /* knappen rett under lista, ikke nederst */
+
+.knapp {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--kant);
+  border-radius: 3px;
+  background: var(--kort);
+  color: var(--tekst);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.knapp:disabled { opacity: 0.55; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .knapp:not(:disabled):hover { border-color: var(--aksent); color: var(--aksent); }
+}
+
+.offline-merknad {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--dempet);
+}
+
 /* ---------- Mobil ---------- */
 
 @media (max-width: 600px) {

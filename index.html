@@ -39,6 +39,7 @@
         <span class="oppslag-kicker" data-t="byguiderKicker">Nabolag &amp; gåturer</span>
         <span class="oppslag-navn" data-t="byguiderNavn">Pål og Vibekes byguider</span>
         <span class="oppslag-notat" data-t="byguiderNotat">Nabolag, restauranter og annet verdt en omvei. London, Nice, Oslo og New York.</span>
+        <span class="oppslag-offline" id="offline-byguider" hidden></span>
       </span>
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
@@ -49,11 +50,17 @@
         <span class="oppslag-kicker" data-t="reiseKicker">Reisekart &amp; reisekalender</span>
         <span class="oppslag-navn" data-t="reiseNavn">Reiseplanlegging</span>
         <span class="oppslag-notat" data-t="reiseNotat">Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.</span>
+        <span class="oppslag-offline" id="offline-reise" hidden></span>
       </span>
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
 
   </nav>
+
+  <section class="offline-boks" id="offline-boks" hidden>
+    <button type="button" class="knapp" id="lagre-alt" data-t="lagreAlt">Lagre alt for bruk offline</button>
+    <p class="offline-merknad" id="offline-merknad" aria-live="polite"></p>
+  </section>
 
 </main>
 
@@ -81,7 +88,16 @@ const TEKST = {
     byguiderKicker: 'Nabolag & gåturer', byguiderNavn: 'Pål og Vibekes byguider',
     byguiderNotat: 'Nabolag, restauranter og annet verdt en omvei. London, Nice, Oslo og New York.',
     reiseKicker: 'Reisekart & reisekalender', reiseNavn: 'Reiseplanlegging',
-    reiseNotat: 'Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.'
+    reiseNotat: 'Beste reisetid per reisemål, måned for måned — rundt 40 steder utenfor Europa.',
+    lagreAlt: 'Lagre alt for bruk offline',
+    lagreMerknad: 'Henter reiseplanleggingen og kartene for alle byguidene, ca. 100 MB i alt. Bruk wifi.',
+    lagrer: navn => 'Lagrer ' + navn + ' …',
+    lagrerBy: (by, pst, n, tot) => 'Lagrer ' + by + ' … ' + pst + ' % (by ' + n + ' av ' + tot + ')',
+    ferdig: 'Alt er tilgjengelig offline.',
+    delvis: 'Noe ble ikke lagret. Prøv igjen.',
+    kreverNett: 'Krever nett.',
+    klar: dato => 'Tilgjengelig offline · ' + dato,
+    maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des'
   },
   en: {
     sprak: 'Language', apper: 'Apps',
@@ -89,7 +105,16 @@ const TEKST = {
     byguiderKicker: 'Neighbourhoods & walks', byguiderNavn: 'Pål and Vibeke’s city guides',
     byguiderNotat: 'Neighbourhoods, restaurants and more worth a detour. London, Nice, Oslo and New York.',
     reiseKicker: 'Travel map & travel calendar', reiseNavn: 'Travel planning',
-    reiseNotat: 'Best time to travel, destination by destination, month by month — around 40 places outside Europe. In Norwegian only.'
+    reiseNotat: 'Best time to travel, destination by destination, month by month — around 40 places outside Europe. In Norwegian only.',
+    lagreAlt: 'Save everything for offline use',
+    lagreMerknad: 'Downloads travel planning and the maps for all city guides, about 100 MB in total. Use Wi-Fi.',
+    lagrer: navn => 'Saving ' + navn + ' …',
+    lagrerBy: (by, pst, n, tot) => 'Saving ' + by + ' … ' + pst + '% (city ' + n + ' of ' + tot + ')',
+    ferdig: 'Everything is available offline.',
+    delvis: 'Something was not saved. Try again.',
+    kreverNett: 'Requires a connection.',
+    klar: dato => 'Available offline · ' + dato,
+    maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'
   }
 };
 
@@ -110,6 +135,7 @@ function tegn() {
   const T = TEKST[sprak];
   document.documentElement.lang = sprak;
   document.querySelectorAll('[data-t]').forEach(e => { e.textContent = T[e.dataset.t]; });
+  visOfflineStatus();
   document.querySelectorAll('[data-t-aria]').forEach(e => { e.setAttribute('aria-label', T[e.dataset.tAria]); });
   document.querySelectorAll('.sprakvalg [data-sprak]').forEach(b => {
     b.setAttribute('aria-pressed', b.dataset.sprak === sprak ? 'true' : 'false');
@@ -132,6 +158,138 @@ document.addEventListener('click', e => {
   history.replaceState(null, '', u);
   tegn();
 });
+
+/* «Lagre alt for bruk offline»: installerer service workerne til reiseplanleggingen og byguidene
+   (selv om de ikke er åpnet) og ber dem lagre alt — se meldingen «lagre» i deres sw.js. Status per
+   app leses fra de samme nøklene som app-ene selv skriver. KARTSTIL og MapLibre er de samme som
+   i byguidene (app.js og index.html der). */
+const REISE = '/reiseplanlegging/', BYGUIDER = '/byguider/';
+const KARTSTIL = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+const MAPLIBRE = ['https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css', 'https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js'];
+const lesLager = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const skrivLager = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+let lagrer = false, merknadSatt = false;
+
+function datoTekst(v) {
+  const d = v ? new Date(v) : null;
+  if (!d || isNaN(d)) return null;
+  const m = TEKST[sprak].maaneder.split(' ')[d.getMonth()];
+  return sprak === 'en' ? d.getDate() + ' ' + m : d.getDate() + '. ' + m;
+}
+
+/* Byguidene regnes som tilgjengelige når alle byene er lagret; eldste dato vises. */
+function visOfflineStatus() {
+  const T = TEKST[sprak];
+  const vis = (id, v) => {
+    const el = document.getElementById(id), d = datoTekst(v);
+    el.hidden = !d;
+    if (d) el.textContent = T.klar(d);
+  };
+  vis('offline-reise', lesLager('reiseplanlegging-offline:' + REISE));
+  let byer = [];
+  try { byer = JSON.parse(lesLager('stampe-byguider-byer') || '[]'); } catch (e) {}
+  const datoer = byer.map(id => lesLager('byguider-offline:' + BYGUIDER + id));
+  vis('offline-byguider', byer.length && datoer.every(Boolean) ? datoer.sort()[0] : null);
+  const merknad = document.getElementById('offline-merknad');
+  if (!lagrer && !merknadSatt) merknad.textContent = T.lagreMerknad;
+}
+
+/* Registrerer app-ens service worker og venter til siste versjon er aktiv. Har nettleseren en eldre
+   utgave fra før, ville meldingen ellers gått til den gamle, som ikke kjenner «lagre». */
+async function aktiv(sti) {
+  const reg = await navigator.serviceWorker.register(sti + 'sw.js', { scope: sti });
+  try { await reg.update(); } catch (e) { /* bruk den vi har */ }
+  const ny = reg.installing || reg.waiting;
+  if (ny && ny.state !== 'activated') {
+    await new Promise(res => {
+      ny.addEventListener('statechange', () => { if (ny.state === 'activated' || ny.state === 'redundant') res(); });
+      setTimeout(res, 60000);
+    });
+  }
+  return reg.active;
+}
+
+/* Sender meldingen med en egen svarkanal (MessageChannel) og kaller hver(svar) for hvert svar.
+   Løser seg når hver gir noe annet enn undefined, eller med 'tidsavbrudd' etter frist ms uten svar. */
+function send(sw, melding, hver, frist) {
+  return new Promise(res => {
+    const kanal = new MessageChannel();
+    let tid;
+    const vakt = () => { clearTimeout(tid); tid = setTimeout(() => { kanal.port1.close(); res('tidsavbrudd'); }, frist); };
+    kanal.port1.onmessage = e => {
+      vakt();
+      const v = hver(e.data || {});
+      if (v !== undefined) { clearTimeout(tid); kanal.port1.close(); res(v); }
+    };
+    vakt();
+    sw.postMessage(melding, [kanal.port2]);
+  });
+}
+
+async function lagreAlt() {
+  const T = () => TEKST[sprak];
+  const merknad = document.getElementById('offline-merknad');
+  const knapp = document.getElementById('lagre-alt');
+  if (lagrer) return;
+  if (!navigator.onLine) { merknad.textContent = T().kreverNett; merknadSatt = true; return; }
+  lagrer = true;
+  knapp.disabled = true;
+  let feil = 0;
+  const adresser = performance.getEntriesByType('resource').map(e => e.name).filter(u => /^https?:/.test(u));
+
+  // 1. Reiseplanleggingen: én side med data, ECharts og fonter.
+  try {
+    merknad.textContent = T().lagrer(sprak === 'en' ? 'travel planning' : 'reiseplanleggingen');
+    const sw = await aktiv(REISE);
+    const m = await send(sw, { type: 'lagre', adresser: adresser },
+      m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 180000);
+    if (m === 'tidsavbrudd' || m.feilet) feil++;
+    else skrivLager('reiseplanlegging-offline:' + REISE, new Date().toISOString());
+  } catch (e) { feil++; }
+  visOfflineStatus();
+
+  // 2. Byguidene: alle byene, med kart.
+  try {
+    const byer = ((await (await fetch(BYGUIDER + 'byer.json', { cache: 'no-store' })).json()).byer || [])
+      .filter(b => b.status !== 'kommer');
+    skrivLager('stampe-byguider-byer', JSON.stringify(byer.map(b => b.id)));
+    const navn = id => { const b = byer.find(x => x.id === id) || {}; return (sprak === 'en' && b.navn_en) || b.navn || id; };
+    merknad.textContent = T().lagrerBy(navn(byer[0].id), 0, 1, byer.length);
+    const sw = await aktiv(BYGUIDER);
+    const igjen = new Set(byer.map(b => b.id));
+    const melding = { type: 'lagre', stil: KARTSTIL, adresser: MAPLIBRE.concat(adresser), byer: byer.map(b => ({
+      id: b.id,
+      side: new URL(BYGUIDER + b.id + '/', location.href).href,
+      data: new URL(BYGUIDER + (b.data || 'data/' + b.id + '.md'), location.href).href,
+      geometri: b.geometri ? new URL(BYGUIDER + b.geometri, location.href).href : null
+    })) };
+    const ferdig = await send(sw, melding, m => {
+      if (!igjen.has(m.by)) return undefined;
+      const nr = byer.length - igjen.size + 1;
+      if (m.type === 'fremdrift') merknad.textContent = T().lagrerBy(navn(m.by), Math.floor(100 * m.ferdig / Math.max(1, m.totalt)), nr, byer.length);
+      if (m.type === 'lagret') {
+        if (m.feilet) feil++;
+        else skrivLager('byguider-offline:' + BYGUIDER + m.by, new Date().toISOString());
+        igjen.delete(m.by);
+        visOfflineStatus();
+        if (!igjen.size) return 'ferdig';
+      }
+      return undefined;
+    }, 120000);
+    if (ferdig === 'tidsavbrudd') feil++;
+  } catch (e) { feil++; }
+
+  lagrer = false;
+  merknadSatt = true;
+  knapp.disabled = false;
+  visOfflineStatus();
+  merknad.textContent = feil ? T().delvis : T().ferdig;
+}
+
+if ('serviceWorker' in navigator) {
+  document.getElementById('lagre-alt').addEventListener('click', lagreAlt);
+  document.getElementById('offline-boks').hidden = false;
+}
 
 tegn();
 </script>
