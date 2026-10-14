@@ -94,7 +94,10 @@ const TEKST = {
     lagrer: navn => 'Lagrer ' + navn + ' …',
     lagrerBy: (by, pst, n, tot) => 'Lagrer ' + by + ' … ' + pst + ' % (by ' + n + ' av ' + tot + ')',
     ferdig: 'Alt er tilgjengelig offline.',
-    delvis: 'Noe ble ikke lagret. Prøv igjen.',
+    delvis: d => 'Noe ble ikke lagret (' + d + '). Prøv igjen.',
+    reiseKort: 'reiseplanleggingen', byguiderKort: 'byguidene',
+    svarteIkke: navn => navn + ' svarte ikke',
+    filerFeilet: (navn, n, info) => navn + ': ' + n + (n === 1 ? ' fil' : ' filer') + ' feilet' + (info ? ', ' + info : ''),
     kreverNett: 'Krever nett.',
     klar: dato => 'Tilgjengelig offline · ' + dato,
     maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des'
@@ -111,7 +114,10 @@ const TEKST = {
     lagrer: navn => 'Saving ' + navn + ' …',
     lagrerBy: (by, pst, n, tot) => 'Saving ' + by + ' … ' + pst + '% (city ' + n + ' of ' + tot + ')',
     ferdig: 'Everything is available offline.',
-    delvis: 'Something was not saved. Try again.',
+    delvis: d => 'Something was not saved (' + d + '). Try again.',
+    reiseKort: 'travel planning', byguiderKort: 'city guides',
+    svarteIkke: navn => navn + ' did not respond',
+    filerFeilet: (navn, n, info) => navn + ': ' + n + (n === 1 ? ' file' : ' files') + ' failed' + (info ? ', ' + info : ''),
     kreverNett: 'Requires a connection.',
     klar: dato => 'Available offline · ' + dato,
     maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'
@@ -226,29 +232,26 @@ function send(sw, melding, hver, frist) {
   });
 }
 
-async function lagreAlt() {
-  const T = () => TEKST[sprak];
-  const merknad = document.getElementById('offline-merknad');
-  const knapp = document.getElementById('lagre-alt');
-  if (lagrer) return;
-  if (!navigator.onLine) { merknad.textContent = T().kreverNett; merknadSatt = true; return; }
-  lagrer = true;
-  knapp.disabled = true;
-  let feil = 0;
-  const adresser = performance.getEntriesByType('resource').map(e => e.name).filter(u => /^https?:/.test(u));
-
-  // 1. Reiseplanleggingen: én side med data, ECharts og fonter.
+/* Reiseplanleggingen: én side med data, ECharts og fonter. Gir null når alt er lagret, ellers en feiltekst. */
+async function lagreReise(adresser) {
+  const T = TEKST[sprak];
   try {
-    merknad.textContent = T().lagrer(sprak === 'en' ? 'travel planning' : 'reiseplanleggingen');
     const sw = await aktiv(REISE);
     const m = await send(sw, { type: 'lagre', adresser: adresser },
       m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 180000);
-    if (m === 'tidsavbrudd' || m.feilet) feil++;
-    else skrivLager('reiseplanlegging-offline:' + REISE, new Date().toISOString());
-  } catch (e) { feil++; }
-  visOfflineStatus();
+    if (m === 'tidsavbrudd') return T.svarteIkke(T.reiseKort);
+    if (m.feilet) {
+      if (m.feilede) console.warn('Reiseplanlegging, ikke lagret:', m.feilede);
+      return T.filerFeilet(T.reiseKort, m.feilet, (m.feilede || [])[0]);
+    }
+    skrivLager('reiseplanlegging-offline:' + REISE, new Date().toISOString());
+    return null;
+  } catch (e) { return T.reiseKort + ': ' + (e && e.message || e); }
+}
 
-  // 2. Byguidene: alle byene, med kart.
+/* Byguidene: alle byene, med kart. Gir null når alt er lagret, ellers en feiltekst. */
+async function lagreByguider(adresser, merknad) {
+  const T = () => TEKST[sprak];
   try {
     const byer = ((await (await fetch(BYGUIDER + 'byer.json', { cache: 'no-store' })).json()).byer || [])
       .filter(b => b.status !== 'kommer');
@@ -257,6 +260,7 @@ async function lagreAlt() {
     merknad.textContent = T().lagrerBy(navn(byer[0].id), 0, 1, byer.length);
     const sw = await aktiv(BYGUIDER);
     const igjen = new Set(byer.map(b => b.id));
+    const feilet = [];
     const melding = { type: 'lagre', stil: KARTSTIL, adresser: MAPLIBRE.concat(adresser), byer: byer.map(b => ({
       id: b.id,
       side: new URL(BYGUIDER + b.id + '/', location.href).href,
@@ -268,7 +272,7 @@ async function lagreAlt() {
       const nr = byer.length - igjen.size + 1;
       if (m.type === 'fremdrift') merknad.textContent = T().lagrerBy(navn(m.by), Math.floor(100 * m.ferdig / Math.max(1, m.totalt)), nr, byer.length);
       if (m.type === 'lagret') {
-        if (m.feilet) feil++;
+        if (m.feilet) feilet.push(T().filerFeilet(navn(m.by), m.feilet));
         else skrivLager('byguider-offline:' + BYGUIDER + m.by, new Date().toISOString());
         igjen.delete(m.by);
         visOfflineStatus();
@@ -276,14 +280,43 @@ async function lagreAlt() {
       }
       return undefined;
     }, 120000);
-    if (ferdig === 'tidsavbrudd') feil++;
-  } catch (e) { feil++; }
+    if (ferdig === 'tidsavbrudd') return T().svarteIkke(T().byguiderKort);
+    return feilet.length ? feilet.join('; ') : null;
+  } catch (e) { return TEKST[sprak].byguiderKort + ': ' + (e && e.message || e); }
+}
+
+/* Hver app får ett nytt forsøk hvis det første feiler; det som alt er lagret, hoppes over. */
+async function lagreAlt() {
+  const T = () => TEKST[sprak];
+  const merknad = document.getElementById('offline-merknad');
+  const knapp = document.getElementById('lagre-alt');
+  if (lagrer) return;
+  if (!navigator.onLine) { merknad.textContent = T().kreverNett; merknadSatt = true; return; }
+  lagrer = true;
+  knapp.disabled = true;
+  const adresser = performance.getEntriesByType('resource').map(e => e.name).filter(u => /^https?:/.test(u));
+  const feil = [];
+
+  let f = null;
+  for (let forsok = 0; forsok < 2; forsok++) {
+    merknad.textContent = T().lagrer(T().reiseKort);
+    f = await lagreReise(adresser);
+    if (!f) break;
+  }
+  if (f) feil.push(f);
+  visOfflineStatus();
+
+  for (let forsok = 0; forsok < 2; forsok++) {
+    f = await lagreByguider(adresser, merknad);
+    if (!f) break;
+  }
+  if (f) feil.push(f);
 
   lagrer = false;
   merknadSatt = true;
   knapp.disabled = false;
   visOfflineStatus();
-  merknad.textContent = feil ? T().delvis : T().ferdig;
+  merknad.textContent = feil.length ? T().delvis(feil.join('; ')) : T().ferdig;
 }
 
 if ('serviceWorker' in navigator) {
