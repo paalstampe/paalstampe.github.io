@@ -194,24 +194,35 @@ function visOfflineStatus() {
   if (!lagrer && !merknadSatt) merknad.textContent = T.lagreMerknad;
 }
 
-function aktiv(reg) {
-  return new Promise(res => {
-    if (reg.active) return res(reg.active);
-    const sw = reg.installing || reg.waiting;
-    sw.addEventListener('statechange', () => { if (sw.state === 'activated') res(reg.active); });
-  });
+/* Registrerer app-ens service worker og venter til siste versjon er aktiv. Har nettleseren en eldre
+   utgave fra før, ville meldingen ellers gått til den gamle, som ikke kjenner «lagre». */
+async function aktiv(sti) {
+  const reg = await navigator.serviceWorker.register(sti + 'sw.js', { scope: sti });
+  try { await reg.update(); } catch (e) { /* bruk den vi har */ }
+  const ny = reg.installing || reg.waiting;
+  if (ny && ny.state !== 'activated') {
+    await new Promise(res => {
+      ny.addEventListener('statechange', () => { if (ny.state === 'activated' || ny.state === 'redundant') res(); });
+      setTimeout(res, 60000);
+    });
+  }
+  return reg.active;
 }
 
-/* Venter på meldinger fra service workerne; vent(sjekk) løser seg når sjekk(melding) gir noe annet enn undefined. */
-const lyttere = new Set();
-function vent(sjekk, frist) {
+/* Sender meldingen med en egen svarkanal (MessageChannel) og kaller hver(svar) for hvert svar.
+   Løser seg når hver gir noe annet enn undefined, eller med 'tidsavbrudd' etter frist ms uten svar. */
+function send(sw, melding, hver, frist) {
   return new Promise(res => {
+    const kanal = new MessageChannel();
     let tid;
-    const f = m => { const v = sjekk(m); if (v !== undefined) { lyttere.delete(f); clearTimeout(tid); res(v); } };
-    const nullstill = () => { clearTimeout(tid); tid = setTimeout(() => { lyttere.delete(f); res('tidsavbrudd'); }, frist); };
-    f.nullstill = nullstill;
-    nullstill();
-    lyttere.add(f);
+    const vakt = () => { clearTimeout(tid); tid = setTimeout(() => { kanal.port1.close(); res('tidsavbrudd'); }, frist); };
+    kanal.port1.onmessage = e => {
+      vakt();
+      const v = hver(e.data || {});
+      if (v !== undefined) { clearTimeout(tid); kanal.port1.close(); res(v); }
+    };
+    vakt();
+    sw.postMessage(melding, [kanal.port2]);
   });
 }
 
@@ -229,10 +240,9 @@ async function lagreAlt() {
   // 1. Reiseplanleggingen: én side med data, ECharts og fonter.
   try {
     merknad.textContent = T().lagrer(sprak === 'en' ? 'travel planning' : 'reiseplanleggingen');
-    const sw = await aktiv(await navigator.serviceWorker.register(REISE + 'sw.js', { scope: REISE }));
-    const svar = vent(m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 180000);
-    sw.postMessage({ type: 'lagre', adresser: adresser });
-    const m = await svar;
+    const sw = await aktiv(REISE);
+    const m = await send(sw, { type: 'lagre', adresser: adresser },
+      m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 180000);
     if (m === 'tidsavbrudd' || m.feilet) feil++;
     else skrivLager('reiseplanlegging-offline:' + REISE, new Date().toISOString());
   } catch (e) { feil++; }
@@ -245,9 +255,15 @@ async function lagreAlt() {
     skrivLager('stampe-byguider-byer', JSON.stringify(byer.map(b => b.id)));
     const navn = id => { const b = byer.find(x => x.id === id) || {}; return (sprak === 'en' && b.navn_en) || b.navn || id; };
     merknad.textContent = T().lagrerBy(navn(byer[0].id), 0, 1, byer.length);
-    const sw = await aktiv(await navigator.serviceWorker.register(BYGUIDER + 'sw.js', { scope: BYGUIDER }));
+    const sw = await aktiv(BYGUIDER);
     const igjen = new Set(byer.map(b => b.id));
-    const ferdig = vent(m => {
+    const melding = { type: 'lagre', stil: KARTSTIL, adresser: MAPLIBRE.concat(adresser), byer: byer.map(b => ({
+      id: b.id,
+      side: new URL(BYGUIDER + b.id + '/', location.href).href,
+      data: new URL(BYGUIDER + (b.data || 'data/' + b.id + '.md'), location.href).href,
+      geometri: b.geometri ? new URL(BYGUIDER + b.geometri, location.href).href : null
+    })) };
+    const ferdig = await send(sw, melding, m => {
       if (!igjen.has(m.by)) return undefined;
       const nr = byer.length - igjen.size + 1;
       if (m.type === 'fremdrift') merknad.textContent = T().lagrerBy(navn(m.by), Math.floor(100 * m.ferdig / Math.max(1, m.totalt)), nr, byer.length);
@@ -260,13 +276,7 @@ async function lagreAlt() {
       }
       return undefined;
     }, 120000);
-    sw.postMessage({ type: 'lagre', stil: KARTSTIL, adresser: MAPLIBRE.concat(adresser), byer: byer.map(b => ({
-      id: b.id,
-      side: new URL(BYGUIDER + b.id + '/', location.href).href,
-      data: new URL(BYGUIDER + (b.data || 'data/' + b.id + '.md'), location.href).href,
-      geometri: b.geometri ? new URL(BYGUIDER + b.geometri, location.href).href : null
-    })) });
-    if (await ferdig === 'tidsavbrudd') feil++;
+    if (ferdig === 'tidsavbrudd') feil++;
   } catch (e) { feil++; }
 
   lagrer = false;
@@ -277,11 +287,6 @@ async function lagreAlt() {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', e => {
-    const m = e.data || {};
-    lyttere.forEach(f => { f(m); if (lyttere.has(f)) f.nullstill(); });
-  });
-  navigator.serviceWorker.startMessages();   // Safari leverer ellers ikke meldingene til addEventListener
   document.getElementById('lagre-alt').addEventListener('click', lagreAlt);
   document.getElementById('offline-boks').hidden = false;
 }
