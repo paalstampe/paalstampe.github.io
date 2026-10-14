@@ -27,6 +27,10 @@
     </div>
     <h1 class="tittel" data-t="tittel">Påls apper</h1>
     <p class="ingress" data-t="ingress">Små verktøy for reise og byer, laget for eget bruk.</p>
+    <aside class="hjemskjerm" id="hjemskjerm" hidden>
+      <p class="hjemskjerm-tekst"><strong data-t="hjemTittel">Bruk stam.pe som app</strong><br><span id="hjemskjerm-hvordan"></span></p>
+      <button type="button" class="hjemskjerm-lukk" id="hjemskjerm-lukk" data-t-aria="lukk">&times;</button>
+    </aside>
   </header>
 
   <!-- Ny app: kopier en <a class="oppslag"> og endre href, tekst og bilde.
@@ -100,7 +104,10 @@ const TEKST = {
     filerFeilet: (navn, n, info) => navn + ': ' + n + (n === 1 ? ' fil' : ' filer') + ' feilet' + (info ? ', ' + info : ''),
     kreverNett: 'Krever nett.',
     klar: dato => 'Tilgjengelig offline · ' + dato,
-    maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des'
+    maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des',
+    hjemTittel: 'Bruk stam.pe som app',
+    hjemHvordan: del => 'Trykk ' + del + ' Del i Safari (eller ··· og så Del), og velg «Legg til på Hjem-skjerm».',
+    lukk: 'Lukk'
   },
   en: {
     sprak: 'Language', apper: 'Apps',
@@ -120,7 +127,10 @@ const TEKST = {
     filerFeilet: (navn, n, info) => navn + ': ' + n + (n === 1 ? ' file' : ' files') + ' failed' + (info ? ', ' + info : ''),
     kreverNett: 'Requires a connection.',
     klar: dato => 'Available offline · ' + dato,
-    maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'
+    maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec',
+    hjemTittel: 'Use stam.pe as an app',
+    hjemHvordan: del => 'Tap ' + del + ' Share in Safari (or ··· then Share), and choose “Add to Home Screen”.',
+    lukk: 'Close'
   }
 };
 
@@ -142,6 +152,7 @@ function tegn() {
   document.documentElement.lang = sprak;
   document.querySelectorAll('[data-t]').forEach(e => { e.textContent = T[e.dataset.t]; });
   visOfflineStatus();
+  visHjemskjerm();
   document.querySelectorAll('[data-t-aria]').forEach(e => { e.setAttribute('aria-label', T[e.dataset.tAria]); });
   document.querySelectorAll('.sprakvalg [data-sprak]').forEach(b => {
     b.setAttribute('aria-pressed', b.dataset.sprak === sprak ? 'true' : 'false');
@@ -163,6 +174,21 @@ document.addEventListener('click', e => {
   if (sprak === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
   history.replaceState(null, '', u);
   tegn();
+});
+
+/* Veiledning for hjemskjermen: iOS kan ikke installere siden selv, så på iPhone/iPad i nettleseren
+   (ikke åpnet som app) vises en liten boks med fremgangsmåten. Lukkes for godt med ×. */
+const DEL_IKON = '<svg class="del-ikon" viewBox="0 0 16 18" width="12" height="14" aria-hidden="true"><path d="M8 1.5v9.5M4.75 4.75 8 1.5l3.25 3.25M5.5 7.5H2.75v9h10.5v-9H10.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+const erIos = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const somApp = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+function visHjemskjerm() {
+  const boks = document.getElementById('hjemskjerm');
+  boks.hidden = !erIos || somApp || lesLager('stampe-hjemskjerm-lukket') === '1';
+  if (!boks.hidden) document.getElementById('hjemskjerm-hvordan').innerHTML = TEKST[sprak].hjemHvordan(DEL_IKON);
+}
+document.getElementById('hjemskjerm-lukk').addEventListener('click', () => {
+  skrivLager('stampe-hjemskjerm-lukket', '1');
+  visHjemskjerm();
 });
 
 /* «Lagre alt for bruk offline»: installerer service workerne til reiseplanleggingen og byguidene

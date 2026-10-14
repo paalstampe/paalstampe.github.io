@@ -96,6 +96,38 @@ html, body {
 .sprakvalg button[aria-pressed="true"] { color: var(--tekst); border-bottom-color: var(--aksent); }
 .sprakvalg button:focus-visible { outline: 1px solid var(--aksent); outline-offset: 2px; }
 
+/* ---------- Veiledning for hjemskjermen (bare iPhone/iPad i nettleseren) ---------- */
+
+.hjemskjerm {
+  position: relative;
+  margin: 22px 0 0;
+  padding: 12px 40px 13px 14px;
+  border: 1px solid var(--kant);
+  background: var(--kort);
+  max-width: 46ch;
+}
+.hjemskjerm-tekst {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--dempet);
+}
+.hjemskjerm-tekst strong { color: var(--tekst); font-weight: 600; }
+.del-ikon { vertical-align: -2px; color: var(--aksent); }
+.hjemskjerm-lukk {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--dempet);
+  cursor: pointer;
+}
+
 /* ---------- Liste ---------- */
 
 .liste {
