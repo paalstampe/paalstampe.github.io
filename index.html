@@ -201,10 +201,15 @@ function visOfflineStatus() {
 }
 
 /* Registrerer app-ens service worker og venter til siste versjon er aktiv. Har nettleseren en eldre
-   utgave fra før, ville meldingen ellers gått til den gamle, som ikke kjenner «lagre». */
+   utgave fra før, ville meldingen ellers gått til den gamle. Safari melder ikke alltid en ny versjon
+   straks update() er ferdig, så vi venter litt på «updatefound» også. */
 async function aktiv(sti) {
   const reg = await navigator.serviceWorker.register(sti + 'sw.js', { scope: sti });
-  try { await reg.update(); } catch (e) { /* bruk den vi har */ }
+  await new Promise(res => {
+    const t = setTimeout(res, 2500);
+    reg.addEventListener('updatefound', () => { clearTimeout(t); res(); }, { once: true });
+    reg.update().catch(() => {});
+  });
   const ny = reg.installing || reg.waiting;
   if (ny && ny.state !== 'activated') {
     await new Promise(res => {
@@ -215,20 +220,45 @@ async function aktiv(sti) {
   return reg.active;
 }
 
-/* Sender meldingen med en egen svarkanal (MessageChannel) og kaller hver(svar) for hvert svar.
-   Løser seg når hver gir noe annet enn undefined, eller med 'tidsavbrudd' etter frist ms uten svar. */
-function send(sw, melding, hver, frist) {
+/* Svar fra service workerne tas imot både på en egen svarkanal (MessageChannel — sikrest i Safari) og som
+   kringkasting (eldre utgaver av service workerne svarer bare slik). hver(svar) kalles for hvert svar,
+   også dobbelt, og må tåle det. Er det stille i stillhet ms, hentes den aktive service workeren på nytt og
+   meldingen sendes igjen (det som alt er lagret, hoppes over). Gir opp etter forsok sendinger. */
+let kringkastet = null;
+function send(sti, melding, hver, stillhet, forsok = 4) {
   return new Promise(res => {
-    const kanal = new MessageChannel();
-    let tid;
-    const vakt = () => { clearTimeout(tid); tid = setTimeout(() => { kanal.port1.close(); res('tidsavbrudd'); }, frist); };
-    kanal.port1.onmessage = e => {
-      vakt();
-      const v = hver(e.data || {});
-      if (v !== undefined) { clearTimeout(tid); kanal.port1.close(); res(v); }
+    let tid, kanal, antall = 0, ferdig = false;
+    const slutt = v => {
+      if (ferdig) return;
+      ferdig = true;
+      clearTimeout(tid);
+      if (kanal) kanal.port1.close();
+      kringkastet = null;
+      res(v);
     };
-    vakt();
-    sw.postMessage(melding, [kanal.port2]);
+    const motta = data => {
+      if (ferdig) return;
+      vakt();
+      const v = hver(data || {});
+      if (v !== undefined) slutt(v);
+    };
+    const vakt = () => {
+      clearTimeout(tid);
+      tid = setTimeout(() => (antall < forsok ? sendNa() : slutt('tidsavbrudd')), stillhet);
+    };
+    async function sendNa() {
+      antall++;
+      vakt();
+      let sw;
+      try { sw = await aktiv(sti); } catch (e) { return; }
+      if (ferdig || !sw) return;
+      if (kanal) kanal.port1.close();
+      kanal = new MessageChannel();
+      kanal.port1.onmessage = e => motta(e.data);
+      sw.postMessage(melding, [kanal.port2]);
+    }
+    kringkastet = motta;
+    sendNa();
   });
 }
 
@@ -236,9 +266,8 @@ function send(sw, melding, hver, frist) {
 async function lagreReise(adresser) {
   const T = TEKST[sprak];
   try {
-    const sw = await aktiv(REISE);
-    const m = await send(sw, { type: 'lagre', adresser: adresser },
-      m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 180000);
+    const m = await send(REISE, { type: 'lagre', adresser: adresser },
+      m => m.type === 'lagret' && m.app === 'reiseplanlegging' ? m : undefined, 60000);
     if (m === 'tidsavbrudd') return T.svarteIkke(T.reiseKort);
     if (m.feilet) {
       if (m.feilede) console.warn('Reiseplanlegging, ikke lagret:', m.feilede);
@@ -258,7 +287,6 @@ async function lagreByguider(adresser, merknad) {
     skrivLager('stampe-byguider-byer', JSON.stringify(byer.map(b => b.id)));
     const navn = id => { const b = byer.find(x => x.id === id) || {}; return (sprak === 'en' && b.navn_en) || b.navn || id; };
     merknad.textContent = T().lagrerBy(navn(byer[0].id), 0, 1, byer.length);
-    const sw = await aktiv(BYGUIDER);
     const igjen = new Set(byer.map(b => b.id));
     const feilet = [];
     const melding = { type: 'lagre', stil: KARTSTIL, adresser: MAPLIBRE.concat(adresser), byer: byer.map(b => ({
@@ -267,7 +295,7 @@ async function lagreByguider(adresser, merknad) {
       data: new URL(BYGUIDER + (b.data || 'data/' + b.id + '.md'), location.href).href,
       geometri: b.geometri ? new URL(BYGUIDER + b.geometri, location.href).href : null
     })) };
-    const ferdig = await send(sw, melding, m => {
+    const ferdig = await send(BYGUIDER, melding, m => {
       if (!igjen.has(m.by)) return undefined;
       const nr = byer.length - igjen.size + 1;
       if (m.type === 'fremdrift') merknad.textContent = T().lagrerBy(navn(m.by), Math.floor(100 * m.ferdig / Math.max(1, m.totalt)), nr, byer.length);
@@ -279,7 +307,7 @@ async function lagreByguider(adresser, merknad) {
         if (!igjen.size) return 'ferdig';
       }
       return undefined;
-    }, 120000);
+    }, 30000);
     if (ferdig === 'tidsavbrudd') return T().svarteIkke(T().byguiderKort);
     return feilet.length ? feilet.join('; ') : null;
   } catch (e) { return TEKST[sprak].byguiderKort + ': ' + (e && e.message || e); }
@@ -320,6 +348,8 @@ async function lagreAlt() {
 }
 
 if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', e => { if (kringkastet) kringkastet(e.data); });
+  navigator.serviceWorker.startMessages();   // Safari leverer ellers ikke kringkastede meldinger
   document.getElementById('lagre-alt').addEventListener('click', lagreAlt);
   document.getElementById('offline-boks').hidden = false;
 }
