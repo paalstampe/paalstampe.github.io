@@ -16,5 +16,7 @@
   --aksent-hover:#E0AA72;
 }
 
-/* Miniatyrene er skjermbilder av lyse sider; dempes litt så de ikke lyser opp. */
+/* Miniatyrer uten egen mørk utgave (<picture> med -mork.webp) er skjermbilder av lyse
+   sider; de dempes litt så de ikke lyser opp. */
 .miniatyr { filter: brightness(0.82); }
+picture .miniatyr { filter: none; }
