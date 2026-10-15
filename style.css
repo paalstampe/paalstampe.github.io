@@ -96,7 +96,7 @@ html, body {
 .sprakvalg button[aria-pressed="true"] { color: var(--tekst); border-bottom-color: var(--aksent); }
 .sprakvalg button:focus-visible { outline: 1px solid var(--aksent); outline-offset: 2px; }
 
-/* ---------- Veiledning for hjemskjermen (bare iPhone/iPad i nettleseren) ---------- */
+/* ---------- Veiledning for hjemskjermen (iPhone/iPad og Safari på Mac, over offline-knappen) ---------- */
 
 .hjemskjerm {
   position: relative;
@@ -203,7 +203,7 @@ html, body {
 }
 
 .offline-boks { padding: 22px 0 0; }
-.liste:has(+ .offline-boks:not([hidden])) { flex-grow: 0; }   /* knappen rett under lista, ikke nederst */
+.liste:has(~ .hjemskjerm:not([hidden]), ~ .offline-boks:not([hidden])) { flex-grow: 0; }   /* boksene rett under lista, ikke nederst */
 
 .knapp {
   height: 30px;

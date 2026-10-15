@@ -27,10 +27,6 @@
     </div>
     <h1 class="tittel" data-t="tittel">Påls apper</h1>
     <p class="ingress" data-t="ingress">Små verktøy for reise og byer, laget for eget bruk.</p>
-    <aside class="hjemskjerm" id="hjemskjerm" hidden>
-      <p class="hjemskjerm-tekst"><strong data-t="hjemTittel">Bruk stam.pe som app</strong><br><span id="hjemskjerm-hvordan"></span></p>
-      <button type="button" class="hjemskjerm-lukk" id="hjemskjerm-lukk" data-t-aria="lukk">&times;</button>
-    </aside>
   </header>
 
   <!-- Ny app: kopier en <a class="oppslag"> og endre href, tekst og bilde.
@@ -61,6 +57,11 @@
 
   </nav>
 
+  <!-- Hjemskjerm-veiledningen står over offline-knappen: installer først, så lagre (iOS-appen har eget lager). -->
+  <aside class="hjemskjerm" id="hjemskjerm" hidden>
+    <p class="hjemskjerm-tekst"><strong data-t="hjemTittel">Bruk stam.pe som app</strong><br><span id="hjemskjerm-hvordan"></span></p>
+    <button type="button" class="hjemskjerm-lukk" id="hjemskjerm-lukk" data-t-aria="lukk">&times;</button>
+  </aside>
   <section class="offline-boks" id="offline-boks" hidden>
     <button type="button" class="knapp" id="lagre-alt" data-t="lagreAlt">Lagre alt for bruk offline</button>
     <p class="offline-merknad" id="offline-merknad" aria-live="polite"></p>
@@ -107,6 +108,7 @@ const TEKST = {
     maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des',
     hjemTittel: 'Bruk stam.pe som app',
     hjemHvordan: del => 'Trykk ' + del + ' Del i Safari (eller ··· og så Del), og velg «Legg til på Hjem-skjerm».',
+    hjemHvordanMac: del => 'Velg Arkiv → «Legg til i Dock …» i Safari (eller ' + del + ' Del og «Legg til i Dock»).',
     lukk: 'Lukk'
   },
   en: {
@@ -130,6 +132,7 @@ const TEKST = {
     maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec',
     hjemTittel: 'Use stam.pe as an app',
     hjemHvordan: del => 'Tap ' + del + ' Share in Safari (or ··· then Share), and choose “Add to Home Screen”.',
+    hjemHvordanMac: del => 'In Safari, choose File → “Add to Dock…” (or ' + del + ' Share, then “Add to Dock”).',
     lukk: 'Close'
   }
 };
@@ -176,15 +179,19 @@ document.addEventListener('click', e => {
   tegn();
 });
 
-/* Veiledning for hjemskjermen: iOS kan ikke installere siden selv, så på iPhone/iPad i nettleseren
-   (ikke åpnet som app) vises en liten boks med fremgangsmåten. Lukkes for godt med ×. */
+/* Veiledning for hjemskjermen: Safari tilbyr ikke å installere siden selv (Chromium-nettlesere gjør det
+   ut fra manifestet), så på iPhone/iPad og i Safari 17+ på Mac (Legg til i Dock), når siden ikke er
+   åpnet som app, vises en liten boks med fremgangsmåten. Lukkes for godt med ×. */
 const DEL_IKON = '<svg class="del-ikon" viewBox="0 0 16 18" width="12" height="14" aria-hidden="true"><path d="M8 1.5v9.5M4.75 4.75 8 1.5l3.25 3.25M5.5 7.5H2.75v9h10.5v-9H10.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 const erIos = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const ua = navigator.userAgent;
+const erMacSafari = !erIos && /Macintosh/.test(ua) && /Safari\//.test(ua) &&
+  !/Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS|Vivaldi/.test(ua) && +((ua.match(/Version\/(\d+)/) || [])[1]) >= 17;
 const somApp = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
 function visHjemskjerm() {
   const boks = document.getElementById('hjemskjerm');
-  boks.hidden = !erIos || somApp || lesLager('stampe-hjemskjerm-lukket') === '1';
-  if (!boks.hidden) document.getElementById('hjemskjerm-hvordan').innerHTML = TEKST[sprak].hjemHvordan(DEL_IKON);
+  boks.hidden = !(erIos || erMacSafari) || somApp || lesLager('stampe-hjemskjerm-lukket') === '1';
+  if (!boks.hidden) document.getElementById('hjemskjerm-hvordan').innerHTML = TEKST[sprak][erIos ? 'hjemHvordan' : 'hjemHvordanMac'](DEL_IKON);
 }
 document.getElementById('hjemskjerm-lukk').addEventListener('click', () => {
   skrivLager('stampe-hjemskjerm-lukket', '1');
