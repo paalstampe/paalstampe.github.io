@@ -1,0 +1,20 @@
+/* Mørk modus (prøve). Lastes bare når enheten er i mørk modus:
+   <link rel="stylesheet" href="mork.css" media="(prefers-color-scheme: dark)">
+   Samme guidebok, men som lest under en leselampe: varm, nesten svart papirflate,
+   lys tekst og en lysere kobber, så aksenten har nok kontrast. Alle farger i style.css
+   går via variablene, så det holder å bytte dem her. */
+
+:root {
+  color-scheme: dark;
+  --papir:       #1B1814;
+  --kort:        #24201B;
+  --tekst:       #ECE5D8;
+  --dempet:      #A6987F;
+  --kant:        #4A4136;
+  --kant-lys:    #362F27;
+  --aksent:      #C99158;
+  --aksent-hover:#E0AA72;
+}
+
+/* Miniatyrene er skjermbilder av lyse sider; dempes litt så de ikke lyser opp. */
+.miniatyr { filter: brightness(0.82); }
