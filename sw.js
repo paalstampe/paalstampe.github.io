@@ -15,7 +15,7 @@ const NETT_FRIST = 4000;
 const OMFANG = new URL('./', self.location).href;
 const UNNTAK = ['byguider/', 'reiseplanlegging/'].map(a => new URL('/' + a, self.location).href);
 const FILER = ['./', 'style.css', 'manifest.webmanifest', 'apple-touch-icon.png', 'ikon-192.png', 'ikon-512.png',
-  'bilder/byguider.webp', 'bilder/reiseplanlegging.webp'];
+  'bilder/byguider.webp', 'bilder/reiseplanlegging.webp', '404.html'];
 const FREMMEDE = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
 const SOK = { ignoreVary: true };
 
@@ -58,6 +58,11 @@ async function nettForst(req) {
   // ?lang=en o.l.: samme side uten parametre er godt nok uten nett
   const kopi = await lager.match(req, SOK) || await lager.match(req, { ignoreVary: true, ignoreSearch: true });
   if (kopi) return kopi;
+  // Ukjent side uten nett: vis 404-siden, som lenker til app-ene
+  if (req.mode === 'navigate') {
+    const ukjent = await lager.match(new URL('404.html', OMFANG).href);
+    if (ukjent) return ukjent;
+  }
   return nett;
 }
 
