@@ -57,7 +57,6 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres.
 - Ingen skygger, ingen avrundede kort — kantlinjer og luft. Skal ligne en guidebok.
 - Mørk modus følger enheten: mork.css (papir #1B1814, tekst #ECE5D8, dempet #A6987F, kobber #C99158).
 
-
 ## Miniatyrer (gjelder alle tre repoene)
 Småbildene finnes flere steder, alle i en lys og en mørk utgave (`-mork.webp`, vises i mørk modus):
 - stam.pe-forsiden og 404-siden (repo `paalstampe.github.io`): `bilder/byguider(-mork).webp` (tatt av Nice-guiden,
@@ -68,6 +67,7 @@ Når et småbilde oppdateres — en app eller by har endret utseende, eller en n
 oppdater alle bildene som viser den, i alle repoene og i begge utgavene, og sjekk forsidene i lys og mørk modus.
 Oppskrift: viewport 1300×900, deviceScaleFactor 2, beskjær 1200×900 fra venstre, skaler til 360×270 webp,
 Playwright med `colorScheme: 'light'` og `'dark'`. Ta bildene fra stam.pe etter at endringen er publisert.
+
 ## DNS
 - Domenet er registrert hos GoDaddy med Fastmail-navneservere; DNS-postene styres hos Fastmail.
   Claude har ikke tilgang dit — beskriv endringen for Pål i stedet.
