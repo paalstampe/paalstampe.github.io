@@ -1,0 +1,22 @@
+# stam.pe skal ikke være søkbar. Søkemotorene slippes inn bare for å se
+# <meta name="robots" content="noindex"> på sidene — stenges de ute her,
+# ser de den ikke, og adressen kan likevel havne i søkeresultatene.
+# Roboter som samler inn tekst til KI-modeller, stenges helt ute.
+
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: PerplexityBot
+User-agent: Bytespider
+User-agent: Meta-ExternalAgent
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: *
+Disallow:
