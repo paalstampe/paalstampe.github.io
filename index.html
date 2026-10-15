@@ -7,6 +7,19 @@
 <meta name="description" content="Pål Stampes små apper for reise og byer.">
 <!-- Ikke i søkemotorer (robots.txt slipper dem inn, ellers ser de ikke denne). Delingskort virker likevel. -->
 <meta name="robots" content="noindex, nofollow, noarchive">
+<!-- Forhåndsvisning når lenken deles (Meldinger, Slack, e-post). Bildet: deling.png, 1200×630. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stam.pe/">
+<meta property="og:site_name" content="stam.pe">
+<meta property="og:title" content="Påls apper">
+<meta property="og:description" content="Små verktøy for reise og byer: byguider og reiseplanlegging.">
+<meta property="og:image" content="https://stam.pe/deling.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PS-frimerke på en konvolutt, og teksten «Påls apper»">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="ikon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -67,6 +80,7 @@
   <section class="offline-boks" id="offline-boks" hidden>
     <button type="button" class="knapp" id="lagre-alt" data-t="lagreAlt">Lagre alt for bruk offline</button>
     <p class="offline-merknad" id="offline-merknad" aria-live="polite"></p>
+    <p class="offline-lager" id="offline-lager" hidden><span id="offline-mengde"></span> · <button type="button" class="lenkeknapp" id="slett-lagret" data-t="slett">Slett</button></p>
   </section>
 
 </main>
@@ -108,6 +122,9 @@ const TEKST = {
     kreverNett: 'Krever nett.',
     klar: dato => 'Tilgjengelig offline · ' + dato,
     maaneder: 'jan feb mar apr mai jun jul aug sep okt nov des',
+    lagretMengde: mb => 'Lagret på denne enheten: ' + mb,
+    slett: 'Slett',
+    slettSporsmal: 'Slette alt som er lagret for bruk offline? Sidene lastes ned igjen neste gang du åpner dem med nett.',
     hjemTittel: 'Bruk stam.pe som app',
     hjemHvordan: del => 'Trykk ' + del + ' Del i Safari (eller ··· og så Del), og velg «Legg til på Hjem-skjerm».',
     hjemHvordanMac: del => 'Velg Arkiv → «Legg til i Dock …» i Safari (eller ' + del + ' Del og «Legg til i Dock»).',
@@ -132,6 +149,9 @@ const TEKST = {
     kreverNett: 'Requires a connection.',
     klar: dato => 'Available offline · ' + dato,
     maaneder: 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec',
+    lagretMengde: mb => 'Stored on this device: ' + mb,
+    slett: 'Delete',
+    slettSporsmal: 'Delete everything saved for offline use? The pages will be downloaded again next time you open them online.',
     hjemTittel: 'Use stam.pe as an app',
     hjemHvordan: del => 'Tap ' + del + ' Share in Safari (or ··· then Share), and choose “Add to Home Screen”.',
     hjemHvordanMac: del => 'In Safari, choose File → “Add to Dock…” (or ' + del + ' Share, then “Add to Dock”).',
@@ -157,6 +177,7 @@ function tegn() {
   document.documentElement.lang = sprak;
   document.querySelectorAll('[data-t]').forEach(e => { e.textContent = T[e.dataset.t]; });
   visOfflineStatus();
+  visLagring();
   visHjemskjerm();
   document.querySelectorAll('[data-t-aria]').forEach(e => { e.setAttribute('aria-label', T[e.dataset.tAria]); });
   document.querySelectorAll('.sprakvalg [data-sprak]').forEach(b => {
@@ -357,6 +378,10 @@ async function lagreAlt() {
   if (!navigator.onLine) { merknad.textContent = T().kreverNett; merknadSatt = true; return; }
   lagrer = true;
   knapp.disabled = true;
+  document.getElementById('slett-lagret').disabled = true;
+  // Ber om varig lager, så nettleseren ikke rydder bort kartene når enheten får lite plass
+  // (Safari gjør det ellers etter en tid uten bruk). Svaret trenger vi ikke.
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   const adresser = performance.getEntriesByType('resource').map(e => e.name).filter(u => /^https?:/.test(u));
   const feil = [];
 
@@ -378,11 +403,45 @@ async function lagreAlt() {
   lagrer = false;
   merknadSatt = true;
   knapp.disabled = false;
+  document.getElementById('slett-lagret').disabled = false;
   visOfflineStatus();
+  visLagring();
   merknad.textContent = feil.length ? T().delvis(feil.join('; ')) : T().ferdig;
 }
 
+/* Plassbruk: hele stam.pe deler ett lager (forsiden og app-ene), så tallet gjelder alt.
+   Vises fra 1 MB, altså i praksis når noe er lagret for offline. Under lagringen oppdateres det ikke. */
+async function visLagring() {
+  const linje = document.getElementById('offline-lager');
+  if (!navigator.storage || !navigator.storage.estimate) return;
+  let bruk = 0;
+  try { bruk = (await navigator.storage.estimate()).usage || 0; } catch (e) {}
+  const mb = bruk / 1e6;
+  linje.hidden = mb < 1;
+  if (linje.hidden) return;
+  const tall = mb.toLocaleString(sprak === 'en' ? 'en-GB' : 'nb-NO', { maximumFractionDigits: mb < 10 ? 1 : 0 });
+  document.getElementById('offline-mengde').textContent = TEKST[sprak].lagretMengde(tall + ' MB');
+}
+
+/* Slett: tømmer alle lagre og avregistrerer alle service workers på stam.pe (forsiden og app-ene),
+   og fjerner datoene for «Tilgjengelig offline». Siden lastes på nytt og lagrer seg selv igjen. */
+async function slettLagret() {
+  if (lagrer || !confirm(TEKST[sprak].slettSporsmal)) return;
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r => r.unregister()));
+    await Promise.all((await caches.keys()).map(n => caches.delete(n)));
+  } catch (e) {}
+  try {
+    Object.keys(localStorage)
+      .filter(k => /^(reiseplanlegging-offline:|byguider-offline:|stampe-byguider-byer$)/.test(k))
+      .forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+  location.reload();
+}
+
 if ('serviceWorker' in navigator) {
+  document.getElementById('slett-lagret').addEventListener('click', slettLagret);
   navigator.serviceWorker.addEventListener('message', e => { if (kringkastet) kringkastet(e.data); });
   navigator.serviceWorker.startMessages();   // Safari leverer ellers ikke kringkastede meldinger
   document.getElementById('lagre-alt').addEventListener('click', lagreAlt);
