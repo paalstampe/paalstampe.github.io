@@ -27,10 +27,6 @@
     </div>
     <h1 class="tittel" data-t="tittel">Påls apper</h1>
     <p class="ingress" data-t="ingress">Små verktøy for reise og byer, laget for eget bruk.</p>
-    <aside class="hjemskjerm" id="hjemskjerm" hidden>
-      <p class="hjemskjerm-tekst"><strong data-t="hjemTittel">Bruk stam.pe som app</strong><br><span id="hjemskjerm-hvordan"></span></p>
-      <button type="button" class="hjemskjerm-lukk" id="hjemskjerm-lukk" data-t-aria="lukk">&times;</button>
-    </aside>
   </header>
 
   <!-- Ny app: kopier en <a class="oppslag"> og endre href, tekst og bilde.
@@ -61,6 +57,11 @@
 
   </nav>
 
+  <!-- Hjemskjerm-veiledningen står over offline-knappen: installer først, så lagre (iOS-appen har eget lager). -->
+  <aside class="hjemskjerm" id="hjemskjerm" hidden>
+    <p class="hjemskjerm-tekst"><strong data-t="hjemTittel">Bruk stam.pe som app</strong><br><span id="hjemskjerm-hvordan"></span></p>
+    <button type="button" class="hjemskjerm-lukk" id="hjemskjerm-lukk" data-t-aria="lukk">&times;</button>
+  </aside>
   <section class="offline-boks" id="offline-boks" hidden>
     <button type="button" class="knapp" id="lagre-alt" data-t="lagreAlt">Lagre alt for bruk offline</button>
     <p class="offline-merknad" id="offline-merknad" aria-live="polite"></p>
