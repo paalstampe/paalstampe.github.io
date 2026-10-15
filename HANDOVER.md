@@ -20,13 +20,15 @@
 
 **Plassbruk og sletting:** under offline-knappen står «Lagret på denne enheten: 98 MB · Slett» (fra 1 MB; `navigator.storage.estimate()`, som gjelder hele stam.pe, ikke bare forsiden). «Lagre alt» ber om varig lager (`navigator.storage.persist()`), så nettleseren ikke rydder bort kartene. «Slett» (med bekreftelse) tømmer alle lagre, avregistrerer alle service workers på stam.pe og fjerner datoene for «Tilgjengelig offline». Deretter lastes siden på nytt og lagrer seg selv igjen. App-ene registrerer sine neste gang de åpnes.
 
+**Mørk modus:** følger enhetens innstilling (`prefers-color-scheme`), ingen egen bryter. `mork.css` lastes bare i mørk modus og bytter fargevariablene i `style.css` (papir #1B1814, tekst #ECE5D8, dempet #A6987F, kobber #C99158). `theme-color` har en lys og en mørk utgave. Miniatyrene har mørke utgaver (`bilder/<app>-mork.webp`) i `<picture>`; en miniatyr uten mørk utgave dempes. Byguidene og reiseplanleggingen har samme mørke palett (byguidene: også omfarget kart i `app.js`, `MORK`).
+
 **App-er** (project sites, arver domenet automatisk):
 - https://stam.pe/byguider/ ← repo `paalstampe/byguider`
 - https://stam.pe/reiseplanlegging/ ← repo `paalstampe/reiseplanlegging`
 
 **Ny app:** nytt repo med Pages på (branch `main`, root, ingen egen CNAME) → havner på `stam.pe/<repo>`. Repoer med forhåndsvisning av grener (som denne og byguidene) bruker i stedet Pages-kilden «GitHub Actions». Legg til en `<a class="oppslag">`-blokk i landingssidens `index.html`.
 
-**Miniatyrer:** hvert oppslag på landingssiden har et lite bilde av app-ens åpningsside foran navnet, i stedet for nummer (01, 02). Filene ligger i `bilder/` som webp, 360×270 (4:3), og vises som 120×90 på desktop og 76×57 på mobil, med tynn kantlinje og rette hjørner. Byguidene bruker Nice-guiden (`/byguider/nice/`), siden byguide-forsiden er nesten tom. Slik lages et bilde: skjermbilde med viewport 1300×900 og deviceScaleFactor 2, beskjær 1200×900 fra venstre, og skaler ned til 360×270 (Playwright, med canvas som gir webp). Ta nytt bilde når en app endrer utseende merkbart. Ny app trenger også en miniatyr.
+**Miniatyrer:** hvert oppslag på landingssiden har et lite bilde av app-ens åpningsside foran navnet, i stedet for nummer (01, 02). Filene ligger i `bilder/` som webp, 360×270 (4:3), og vises som 120×90 på desktop og 76×57 på mobil, med tynn kantlinje og rette hjørner. Byguidene bruker Nice-guiden (`/byguider/nice/`), siden byguide-forsiden er nesten tom. Slik lages et bilde: skjermbilde med viewport 1300×900 og deviceScaleFactor 2, beskjær 1200×900 fra venstre, og skaler ned til 360×270 (Playwright, med canvas som gir webp). Ta nytt bilde når en app endrer utseende merkbart, både lyst og mørkt (Playwright med `colorScheme: 'dark'`). Ny app trenger også en miniatyr.
 
 **Bunntekst:** «Oslo · Nice · London» nederst er fjernet (02.10.2026).
 

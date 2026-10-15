@@ -10,12 +10,14 @@
 <link rel="icon" type="image/png" href="/ikon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#F7F4EE">
+<meta name="theme-color" content="#F7F4EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1814" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/mork.css" media="(prefers-color-scheme: dark)">
 </head>
 <body>
 
@@ -32,7 +34,7 @@
   <nav class="liste" aria-label="Apper" data-t-aria="apper">
 
     <a class="oppslag" href="/byguider/" data-lang-lenke>
-      <img class="miniatyr" src="/bilder/byguider.webp" alt="" width="120" height="90">
+      <picture><source srcset="/bilder/byguider-mork.webp" media="(prefers-color-scheme: dark)"><img class="miniatyr" src="/bilder/byguider.webp" alt="" width="120" height="90"></picture>
       <span class="innhold">
         <span class="oppslag-kicker" data-t="byguiderKicker">Nabolag &amp; gåturer</span>
         <span class="oppslag-navn" data-t="byguiderNavn">Pål og Vibekes byguider</span>
@@ -41,7 +43,7 @@
     </a>
 
     <a class="oppslag" href="/reiseplanlegging/">
-      <img class="miniatyr" src="/bilder/reiseplanlegging.webp" alt="" width="120" height="90">
+      <picture><source srcset="/bilder/reiseplanlegging-mork.webp" media="(prefers-color-scheme: dark)"><img class="miniatyr" src="/bilder/reiseplanlegging.webp" alt="" width="120" height="90"></picture>
       <span class="innhold">
         <span class="oppslag-kicker" data-t="reiseKicker">Reisekart &amp; reisekalender</span>
         <span class="oppslag-navn" data-t="reiseNavn">Reiseplanlegging</span>

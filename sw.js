@@ -14,8 +14,8 @@ const LAGER = 'stampe-' + VERSJON;
 const NETT_FRIST = 4000;
 const OMFANG = new URL('./', self.location).href;
 const UNNTAK = ['byguider/', 'reiseplanlegging/'].map(a => new URL('/' + a, self.location).href);
-const FILER = ['./', 'style.css', 'manifest.webmanifest', 'apple-touch-icon.png', 'ikon-192.png', 'ikon-512.png',
-  'bilder/byguider.webp', 'bilder/reiseplanlegging.webp', '404.html'];
+const FILER = ['./', 'style.css', 'mork.css', 'manifest.webmanifest', 'apple-touch-icon.png', 'ikon-192.png', 'ikon-512.png',
+  'bilder/byguider.webp', 'bilder/byguider-mork.webp', 'bilder/reiseplanlegging.webp', 'bilder/reiseplanlegging-mork.webp', '404.html'];
 const FREMMEDE = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
 const SOK = { ignoreVary: true };
 
