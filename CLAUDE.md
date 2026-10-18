@@ -1,11 +1,14 @@
+Les NOTES.md ved oppstart for gjeldende status.
+
 # stam.pe — arbeidsregler for Claude
 
 Landingssiden for https://stam.pe (GitHub Pages user site, repo `paalstampe/paalstampe.github.io`).
 Den lenker videre til Påls app-er, som er egne repoer og arver domenet:
 - https://stam.pe/byguider/ ← repo `paalstampe/byguider`
 - https://stam.pe/reiseplanlegging/ ← repo `paalstampe/reiseplanlegging`
-Les HANDOVER.md før større endringer — den har DNS, Pages-oppsett, språkvalg og status.
-Hold HANDOVER.md oppdatert når noe vesentlig endres.
+Løpende status, neste steg, åpne spørsmål og beslutningslogg: NOTES.md (oppdateres ved slutten av hver økt).
+Les HANDOVER.md før større endringer — den har DNS, Pages-oppsett, offline og språkvalg.
+Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
 
 ## Språk
 - Svar Pål på norsk, direkte og konsist. Ikke forklar grunnleggende git- eller webbegreper.
