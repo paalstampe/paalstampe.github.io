@@ -1,4 +1,5 @@
-Les NOTES.md ved oppstart for gjeldende status.
+Gjeldende status (lastes inn automatisk):
+@NOTES.md
 
 # stam.pe — arbeidsregler for Claude
 
