@@ -21,7 +21,7 @@ Sist oppdatert: 18. oktober 2026.
 
 ## Åpne spørsmål
 
-- Mørk modus ble lagt inn som «prøve» (commit 15.10.). Skal den beholdes slik den er?
+- Ingen.
 
 ## Beslutningslogg
 
@@ -30,3 +30,4 @@ Sist oppdatert: 18. oktober 2026.
 - 2026-10-15: Siden er ikke søkbar (noindex), og KI-innsamlere er stengt ute i robots.txt. Den skal deles med lenke, ikke finnes.
 - 2026-10-15: Mørk modus følger enheten, uten egen bryter.
 - 2026-10-18: Løpende status føres i NOTES.md. HANDOVER.md er referanse.
+- 2026-10-18: Mørk modus, lagt inn som prøve 15.10., beholdes som den er.
