@@ -13,7 +13,9 @@ Sist oppdatert: 28. oktober 2026.
   (noindex og robots.txt), og mørk modus har mørke miniatyrer.
 - 28.10.: byguide-teksten sier nå også «Byene slik vi bruker dem.», og iPhone forstørrer ikke teksten
   når telefonen ligger (PR #15).
-- Siste kodeendring: tekstforstørrelse (PR #15, 28.10.). Ingen åpne grener utenom `main`.
+- 28.10. sent: reiseplanleggingen finnes på engelsk. «In Norwegian only» er fjernet, og lenken dit får
+  `?lang=en` på engelsk, også på 404-siden (PR #16).
+- Siste kodeendring: lenken til reiseplanleggingen på engelsk (PR #16, 28.10.). Ingen åpne grener utenom `main`.
 
 ## Neste steg
 
@@ -36,3 +38,4 @@ Sist oppdatert: 28. oktober 2026.
 - 2026-10-15: Mørk modus følger enheten, uten egen bryter.
 - 2026-10-18: Løpende status føres i NOTES.md. HANDOVER.md er referanse.
 - 2026-10-18: Mørk modus, lagt inn som prøve 15.10., beholdes som den er.
+- 2026-10-28: Reiseplanleggingen er på norsk og engelsk, så lenken får `data-lang-lenke` som byguidene.
