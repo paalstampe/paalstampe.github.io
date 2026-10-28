@@ -42,7 +42,7 @@
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
 
-    <a class="oppslag" href="/reiseplanlegging/">
+    <a class="oppslag" href="/reiseplanlegging/" data-lang-lenke>
       <picture><source srcset="/bilder/reiseplanlegging-mork.webp" media="(prefers-color-scheme: dark)"><img class="miniatyr" src="/bilder/reiseplanlegging.webp" alt="" width="120" height="90"></picture>
       <span class="innhold">
         <span class="oppslag-kicker" data-t="reiseKicker">Reisekart &amp; reisekalender</span>
@@ -71,7 +71,7 @@ const TEKST = {
     apper: 'Apps', tittel: 'Page not found',
     ingress: 'This address doesn’t exist on stam.pe. Perhaps you were looking for one of these?',
     byguiderKicker: 'Neighbourhoods & walks', byguiderNavn: 'Pål and Vibeke’s city guides',
-    reiseKicker: 'Travel map & travel calendar', reiseNavn: 'Travel planning (in Norwegian)',
+    reiseKicker: 'Travel map & travel calendar', reiseNavn: 'Travel planning',
     forside: '← Go to the front page'
   }
 };
@@ -87,7 +87,7 @@ if (sprak === 'en') {
   document.title = T.tittel + ' · stam.pe';
   document.querySelectorAll('[data-t]').forEach(e => { e.textContent = T[e.dataset.t]; });
   document.querySelectorAll('[data-t-aria]').forEach(e => { e.setAttribute('aria-label', T[e.dataset.tAria]); });
-  document.querySelectorAll('[data-lang-lenke]').forEach(a => { a.href = '/byguider/?lang=en'; });
+  document.querySelectorAll('[data-lang-lenke]').forEach(a => { a.href = a.getAttribute('href') + '?lang=en'; });
 }
 </script>
 

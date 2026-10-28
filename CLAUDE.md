@@ -51,7 +51,7 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
 - Språkvalg NO / EN øverst til høyre. Faste tekster står i TEKST i index.html (data-t-attributter);
   nye UI-tekster skal alltid ha begge språk. Valget lagres i localStorage under `byguider-sprak` — samme
   nøkkel som byguidene, så valget følger med. `?lang=en` overstyrer. Lenker til app-er med engelsk
-  versjon får `data-lang-lenke`. Reiseplanlegging er bare på norsk (står i den engelske teksten).
+  versjon får `data-lang-lenke` (byguidene og reiseplanleggingen).
 - Mobil er like viktig som desktop. Hover-effekter bare under (hover: hover) and (pointer: fine).
   Respekter prefers-reduced-motion.
 

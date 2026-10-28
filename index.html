@@ -62,7 +62,7 @@
       <span class="pil" aria-hidden="true">&rarr;</span>
     </a>
 
-    <a class="oppslag" href="/reiseplanlegging/">
+    <a class="oppslag" href="/reiseplanlegging/" data-lang-lenke>
       <picture><source srcset="bilder/reiseplanlegging-mork.webp" media="(prefers-color-scheme: dark)"><img class="miniatyr" src="bilder/reiseplanlegging.webp" alt="" width="120" height="90"></picture>
       <span class="innhold">
         <span class="oppslag-kicker" data-t="reiseKicker">Reisekart &amp; reisekalender</span>
@@ -139,7 +139,7 @@ const TEKST = {
     byguiderKicker: 'Neighbourhoods & walks', byguiderNavn: 'Pål and Vibeke’s city guides',
     byguiderNotat: 'Opinionated guides to neighbourhoods, restaurants and more worth a detour. The cities as we use them. London, Nice, Oslo, New York, Tokyo and Bangkok.',
     reiseKicker: 'Travel map & travel calendar', reiseNavn: 'Travel planning',
-    reiseNotat: 'Best time to travel, destination by destination, month by month — around 40 places outside Europe. In Norwegian only.',
+    reiseNotat: 'Best time to travel, destination by destination, month by month — around 40 places outside Europe.',
     lagreAlt: 'Save everything for offline use',
     lagreMerknad: 'Downloads travel planning and the maps for all city guides, about 100 MB in total. Use Wi-Fi.',
     lagrer: navn => 'Saving ' + navn + ' …',
@@ -186,7 +186,7 @@ function tegn() {
   document.querySelectorAll('.sprakvalg [data-sprak]').forEach(b => {
     b.setAttribute('aria-pressed', b.dataset.sprak === sprak ? 'true' : 'false');
   });
-  // Lenken til byguidene får ?lang=en, så en delt engelsk lenke holder seg engelsk videre.
+  // Lenkene til appene får ?lang=en, så en delt engelsk lenke holder seg engelsk videre.
   document.querySelectorAll('[data-lang-lenke]').forEach(a => {
     const u = new URL(a.getAttribute('href'), location.href);
     if (sprak === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
