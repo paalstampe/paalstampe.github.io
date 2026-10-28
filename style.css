@@ -22,6 +22,9 @@ html, body {
   font-family: 'Work Sans', system-ui, sans-serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
+  /* Ellers forstørrer iPhone teksten når telefonen ligger. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .side {
