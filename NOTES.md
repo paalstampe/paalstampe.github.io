@@ -5,19 +5,24 @@ Oppdateres ved slutten av hver økt (`/avslutt`).
 
 ## Status nå
 
-Sist oppdatert: 18. oktober 2026.
+Sist oppdatert: 28. oktober 2026.
 
 - Landingssiden er live på https://stam.pe og lenker til Byguider og Reiseplanlegging.
 - På plass: hjemskjermikon (PS-frimerke) og manifest med snarveier, delingsbilde og 404-side.
   «Lagre alt for bruk offline» viser plassbruk og har sletting. Siden er ikke søkbar
   (noindex og robots.txt), og mørk modus har mørke miniatyrer.
-- Siste kodeendring: mørk modus (PR #13, 15.10.). Ingen åpne grener utenom `main`.
+- 28.10.: byguide-teksten sier nå også «Byene slik vi bruker dem.», og iPhone forstørrer ikke teksten
+  når telefonen ligger (PR #15).
+- Siste kodeendring: tekstforstørrelse (PR #15, 28.10.). Ingen åpne grener utenom `main`.
 
 ## Neste steg
 
 - Ingen planlagte endringer. Når en ny app kommer: oppslag i index.html og 404.html, snarvei i manifestet,
   `UNNTAK` i sw.js hvis den har egen service worker, miniatyr i lys og mørk utgave, og eventuelt nytt delingsbilde.
 - Oppdater miniatyren for byguidene når Nice-guiden endrer utseende merkbart.
+- Publiseringen (`.github/workflows/pages.yml`) har `cancel-in-progress: true`. I byguidene ga det en feilet
+  kjøring når fletting og sletting av grenen kom samtidig, og der står kjøringene nå i kø (`false`).
+  Gjør det samme her (og i reiseplanlegging) hvis feilen dukker opp.
 
 ## Åpne spørsmål
 
