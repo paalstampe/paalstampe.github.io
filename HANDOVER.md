@@ -6,7 +6,7 @@ Referansedokument. Løpende status står i NOTES.md.
 
 **Hjemskjerm-ikon:** `apple-touch-icon.png` (180×180, iOS) og `manifest.webmanifest` med `ikon-192.png`/`ikon-512.png` (Android). Konvolutt med frimerke «PS» (Playfair Display) og poststempel, i kobber på #F7F4EE; `ikon-192.png` er også favicon. Tegnet som SVG og gjengitt til PNG med Playwright. Navn under ikonet: «stam.pe» (`apple-mobile-web-app-title`). Åpnes som egen app (`display: standalone`, scope hele stam.pe, så byguider og reiseplanlegging åpnes i samme vindu). iOS henter `/apple-touch-icon.png` også for undersider som ikke har eget ikon.
 
-**Deling:** Open Graph-tagger i `index.html` med `deling.png` (1200×630: ikonet, «stam.pe», «Påls apper», «Byguider og reiseplanlegging»), så lenken får et kort i Meldinger, Slack og e-post. Laget som HTML og tatt bilde av med Playwright. Endres app-lista vesentlig, lag bildet på nytt.
+**Deling:** Open Graph-tagger i `index.html` med `deling.png` (1200×630: ikonet, «stam.pe», «Påls apper», «Byguider og reiseplanlegging»), så lenken får et kort i Meldinger, Slack og e-post. Laget som HTML og tatt bilde av med Playwright. Endres app-lista vesentlig, lag bildet på nytt. App-ene har egne delingsbilder i samme postale familie: postkort med bynavnet i poststempelet (byguidene, ett per by) og luftpostkonvolutt (reiseplanleggingen), og frimerke-ikoner med «b» og «r». De tegnes i `.claude/delingsbilder.html` i hvert app-repo.
 
 **Manifest:** `id` «/», beskrivelse, `ikon-maskable-512.png` (ikonet på 72 % midt på papirflaten, så Android kan beskjære til sirkel uten å kutte konvolutten) og snarveier til Byguider og Reiseplanlegging (høyreklikk / hold inne ikonet i Chrome og Android). Ny app: legg den til i `shortcuts`.
 
