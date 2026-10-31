@@ -10,7 +10,7 @@ Referansedokument. Løpende status står i NOTES.md.
 
 **Manifest:** `id` «/», beskrivelse, `ikon-maskable-512.png` (ikonet på 72 % midt på papirflaten, så Android kan beskjære til sirkel uten å kutte konvolutten) og snarveier til Byguider og Reiseplanlegging (høyreklikk / hold inne ikonet i Chrome og Android). Ny app: legg den til i `shortcuts`.
 
-**404:** `404.html` vises for ukjente adresser på stam.pe (ikke inne i app-ene). Absolutte adresser, bare klassene fra `style.css`, NO/EN etter samme nøkkel. `sw.js` lagrer den og viser den uten nett. Ny app: legg til et oppslag der også.
+**404:** `404.html` vises for ukjente adresser på stam.pe. Pages bruker 404.html fra repoet som eier stien, så byguider og reiseplanlegging har en kopi av den samme filen — endres den, kopier til begge. Absolutte adresser, bare klassene fra `style.css`, NO/EN etter samme nøkkel. `sw.js` lagrer den og viser den uten nett. Ny app: legg til et oppslag der også.
 
 **Veiledning for hjemskjermen:** Safari tilbyr ikke å installere siden selv (Chromium-nettlesere som Chrome og Vivaldi gjør det ut fra manifestet). I Safari 17+ på Mac (`erMacSafari`, ut fra user agent) vises samme boks med «Velg Arkiv → «Legg til i Dock …»» (`hjemHvordanMac`). På iPhone/iPad i nettleseren (ikke åpnet som app, `navigator.standalone` / `display-mode: standalone`) vises en liten boks under app-lista, over «Lagre alt for bruk offline» (installer først: iOS-appen har eget lager): «Bruk stam.pe som app — trykk Del i Safari (eller ··· og så Del), og velg «Legg til på Hjem-skjerm»». Lukkes med × og huskes i localStorage (`stampe-hjemskjerm-lukket`). Vises ikke på PC eller i appen.
 
