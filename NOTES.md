@@ -18,13 +18,17 @@ Sist oppdatert: 31. oktober 2026.
 - 31.10.: ukjente adresser inne i app-ene (f.eks. stam.pe/byguider/berlin/g) viste GitHubs standard-404, fordi Pages
   bruker 404.html fra repoet som eier stien. Byguider og reiseplanlegging har nå en kopi av 404.html
   (byguider #78, reiseplanlegging #18), og kommentaren i filen og HANDOVER.md sier fra.
-- Siste kodeendring: lenken til reiseplanleggingen på engelsk (PR #16, 28.10.). Ingen åpne grener utenom `main`.
+- 31.10.: byguidene og reiseplanleggingen har egne delingskort og frimerke-ikoner i samme postale familie som PS-frimerket
+  (postkort per by og luftpostkonvolutt; byguider #85, reiseplanlegging #19). Landingssiden er uendret; HANDOVER beskriver familien.
+- Siste kodeendring her: lenken til reiseplanleggingen på engelsk (PR #16, 28.10.). Ingen åpne grener utenom `main`.
 
 ## Neste steg
 
 - Ingen planlagte endringer. Når en ny app kommer: oppslag i index.html og 404.html (og kopi av 404.html i alle app-repoene,
   også det nye), snarvei i manifestet,
-  `UNNTAK` i sw.js hvis den har egen service worker, miniatyr i lys og mørk utgave, og eventuelt nytt delingsbilde.
+  `UNNTAK` i sw.js hvis den har egen service worker, miniatyr i lys og mørk utgave, eventuelt nytt delingsbilde, og eget delingskort og frimerke-ikon i appen
+  (`.claude/delingsbilder.html` fra byguider).
+- Mulig: snarveiene i manifestet kan bruke app-enes frimerke-ikoner i stedet for PS-ikonet.
 - Oppdater miniatyren for byguidene når Nice-guiden endrer utseende merkbart.
 - Publiseringen (`.github/workflows/pages.yml`) har `cancel-in-progress: true`. I byguidene ga det en feilet
   kjøring når fletting og sletting av grenen kom samtidig, og der står kjøringene nå i kø (`false`).
@@ -36,6 +40,8 @@ Sist oppdatert: 31. oktober 2026.
 
 ## Beslutningslogg
 
+- 2026-10-31: App-ene får delingskort og ikoner som postsaker: stam.pe er konvolutt med PS-frimerke, byguidene postkort
+  med bynavnet i poststempelet, reiseplanleggingen luftpost. Bokstavikonene («b», «r») så for slappe ut ved siden av frimerket.
 - 2026-10-02: Bunnteksten «Oslo · Nice · London» er fjernet.
 - 2026-10-14: Pages-kilden er «GitHub Actions», slik at grener kan forhåndsvises på `stam.pe/forhandsvisning/<gren>/`.
 - 2026-10-15: Siden er ikke søkbar (noindex), og KI-innsamlere er stengt ute i robots.txt. Den skal deles med lenke, ikke finnes.
