@@ -48,6 +48,8 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   CNAME-filen brukes ikke av Actions, men skal ligge igjen.
 - Ny app: nytt repo med Pages (uten egen CNAME) → havner på stam.pe/<repo>. Legg til en
   `<a class="oppslag">`-blokk i index.html (kopier en eksisterende), med tekster i TEKST på begge språk.
+- 404.html finnes som identisk kopi i byguider og reiseplanlegging (Pages tar 404-siden fra repoet som eier stien).
+  Endres den, kopier til begge; en ny app trenger også en kopi.
 - Språkvalg NO / EN øverst til høyre. Faste tekster står i TEKST i index.html (data-t-attributter);
   nye UI-tekster skal alltid ha begge språk. Valget lagres i localStorage under `byguider-sprak` — samme
   nøkkel som byguidene, så valget følger med. `?lang=en` overstyrer. Lenker til app-er med engelsk
