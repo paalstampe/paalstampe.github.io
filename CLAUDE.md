@@ -74,6 +74,9 @@ oppdater alle bildene som viser den, i alle repoene og i begge utgavene, og sjek
 Oppskrift: viewport 1300×900, deviceScaleFactor 2, beskjær 1200×900 fra venstre, skaler til 360×270 webp,
 Playwright med `colorScheme: 'light'` og `'dark'`. Ta bildene fra stam.pe etter at endringen er publisert.
 
+## Ikoner
+- Ikoner og delingsbilder som byttes, får nytt filnavn (iOS husker gamle bilder etter adresse). Se HANDOVER.
+
 ## DNS
 - Domenet er registrert hos GoDaddy med Fastmail-navneservere; DNS-postene styres hos Fastmail.
   Claude har ikke tilgang dit — beskriv endringen for Pål i stedet.

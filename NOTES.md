@@ -5,8 +5,11 @@ Oppdateres ved slutten av hver økt (`/avslutt`).
 
 ## Status nå
 
-Sist oppdatert: 31. oktober 2026.
+Sist oppdatert: 1. november 2026.
 
+- 1.11.: ved deling fra forsiden på iPhone dukket byguidenes gamle «b»-ikon opp. Det ble byttet ut 31.10. under samme filnavn,
+  og iOS hadde den gamle versjonen lagret. App-ene bruker nå `ikon-frimerke.png` (byguider #90, reiseplanlegging #20), og
+  HANDOVER i alle tre repoene har regelen «nytt ikon = nytt filnavn». Forsidens egne ikonfiler har beholdt navnene.
 - Landingssiden er live på https://stam.pe og lenker til Byguider og Reiseplanlegging.
 - På plass: hjemskjermikon (PS-frimerke) og manifest med snarveier, delingsbilde og 404-side.
   «Lagre alt for bruk offline» viser plassbruk og har sletting. Siden er ikke søkbar
@@ -28,6 +31,8 @@ Sist oppdatert: 31. oktober 2026.
   også det nye), snarvei i manifestet,
   `UNNTAK` i sw.js hvis den har egen service worker, miniatyr i lys og mørk utgave, eventuelt nytt delingsbilde, og eget delingskort og frimerke-ikon i appen
   (`.claude/delingsbilder.html` fra byguider).
+- Neste gang forsidens ikon endres: gi filene nye navn (`apple-touch-icon.png`, `ikon-192.png` osv.) og oppdater
+  index.html, 404.html (også kopiene i app-repoene), manifestet og `FILER` i sw.js.
 - Mulig: snarveiene i manifestet kan bruke app-enes frimerke-ikoner i stedet for PS-ikonet.
 - Oppdater miniatyren for byguidene når Nice-guiden endrer utseende merkbart.
 - Publiseringen (`.github/workflows/pages.yml`) har `cancel-in-progress: true`. I byguidene ga det en feilet
@@ -40,6 +45,8 @@ Sist oppdatert: 31. oktober 2026.
 
 ## Beslutningslogg
 
+- 2026-11-01: Et ikon eller delingsbilde som byttes, får nytt filnavn. iOS lagrer ikoner etter adresse og viste det gamle
+  «b»-ikonet ved deling, et døgn etter at frimerket hadde overtatt filen.
 - 2026-10-31: App-ene får delingskort og ikoner som postsaker: stam.pe er konvolutt med PS-frimerke, byguidene postkort
   med bynavnet i poststempelet, reiseplanleggingen luftpost. Bokstavikonene («b», «r») så for slappe ut ved siden av frimerket.
 - 2026-10-02: Bunnteksten «Oslo · Nice · London» er fjernet.
