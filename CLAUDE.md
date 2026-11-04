@@ -29,7 +29,7 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   (kjøringen dukker opp noen sekunder etter push).
 - Sjekk designet selv: .claude/skjermbilde.sh <url> <fil.png> 390 844 (mobil) og 1300 900 (desktop);
   legg til «hel» for hele siden. Tillatt: https://stam.pe/... og http://localhost:<port>/... (eller 127.0.0.1)
-  (kjør python3 -m http.server 8000 --bind 127.0.0.1 først — gir rask sjekk før push). Virker i skyen og på Macen;
+  (kjør python3 -m http.server 8002 --bind 127.0.0.1 først — gir rask sjekk før push). Virker i skyen og på Macen;
   på Macen kreves Node og Playwright (installasjon øverst i skriptet).
 - Sjekk begge språk (?lang=en) når du endrer tekst eller layout.
 - UI-endringer: kjør axe-core i nettleserpanelet før fletting (last https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js
@@ -40,8 +40,8 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   åpne PR og flett uten å spørre. Er det noe Pål bør se på (designvalg, smak, ordlyd, usikkerhet), push grenen,
   oppgi forhåndsvisningen og vent — flett når han sier ok.
 - Lokal økt på Påls Mac: skal Pål se på noe, start serveren selv om den ikke kjører
-  (python3 -m http.server 8000 --bind 127.0.0.1, i bakgrunnen) og åpne siden for ham med
-  open http://localhost:8000/ (lenkene til app-ene virker ikke lokalt). Stopp serveren når han er ferdig. I skyøkter: bruk forhåndsvisningen.
+  (python3 -m http.server 8002 --bind 127.0.0.1, i bakgrunnen) og åpne siden for ham med
+  open http://localhost:8002/ (lenkene til app-ene virker ikke lokalt). Stopp serveren når han er ferdig. I skyøkter: bruk forhåndsvisningen.
 - Desktop-appen: .claude/launch.json starter serveren på port 8002 i appens innebygde nettleser
   (preview_start), der du kan se, klikke og lese konsollen selv. Portene er 8000 byguider, 8001 reiseplanlegging,
   8002 stam.pe, så alle tre kan kjøre samtidig.

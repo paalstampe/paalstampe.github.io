@@ -31,7 +31,7 @@ Sist oppdatert: 4. november 2026.
   (byguider #78, reiseplanlegging #18), og kommentaren i filen og HANDOVER.md sier fra.
 - 31.10.: byguidene og reiseplanleggingen har egne delingskort og frimerke-ikoner i samme postale familie som PS-frimerket
   (postkort per by og luftpostkonvolutt; byguider #85, reiseplanlegging #19). Landingssiden er uendret; HANDOVER beskriver familien.
-- Siste kodeendring her: lenken til reiseplanleggingen på engelsk (PR #16, 28.10.). Ingen åpne grener utenom `main`.
+- Siste kodeendring her: hooks (validering også etter Bash, sky-push blokkerer ved feil) og axe-core-regelen (PR #20, 4.11.). Ingen åpne grener utenom `main`.
 
 ## Neste steg
 
