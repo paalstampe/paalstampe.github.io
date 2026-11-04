@@ -7,6 +7,11 @@ Oppdateres ved slutten av hver økt (`/avslutt`).
 
 Sist oppdatert: 4. november 2026.
 
+- 4.11.: Claude-oppsett. `.claude/launch.json` lar Claude-appen starte serveren i den innebygde nettleseren (8000 byguider,
+  8001 reiseplanlegging, 8002 stam.pe). Hooks: `.claude/oppstart.sh` sjekker ved oppstart om repoet ligger bak eller foran origin
+  (henter selv når det er trygt) og om /avslutt avviker fra claude-oppsett; `.claude/valider.sh` sjekker JSON/GeoJSON/Python
+  etter hver filendring; `.claude/sky-push.sh` holder skyøkter igjen til committede endringer er pushet.
+  Claude kjører /code-review og /simplify selv før fletting av kodeendringer.
 - 4.11.: miniatyrene av reiseplanleggingen (lys og mørk) er tatt på nytt. Kartet går nå rundt jorda og fyller hele
   bredden (reiseplanlegging #21).
 
@@ -48,6 +53,8 @@ Sist oppdatert: 4. november 2026.
 
 ## Beslutningslogg
 
+- 2026-11-04: Claude kjører /code-review og /simplify selv før fletting av kodeendringer, så Pål slipper å be om det.
+- 2026-11-04: Git-sjekk ved oppstart og push-vakt i sky ligger som hooks i repoet (ikke bare som regel), så de virker både lokalt og i skyøkter.
 - 2026-11-01: Et ikon eller delingsbilde som byttes, får nytt filnavn. iOS lagrer ikoner etter adresse og viste det gamle
   «b»-ikonet ved deling, et døgn etter at frimerket hadde overtatt filen.
 - 2026-10-31: App-ene får delingskort og ikoner som postsaker: stam.pe er konvolutt med PS-frimerke, byguidene postkort
