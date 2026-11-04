@@ -7,6 +7,11 @@ Oppdateres ved slutten av hver økt (`/avslutt`).
 
 Sist oppdatert: 4. november 2026.
 
+- 4.11. kveld: verktøyoversikten (claude-oppsett#1). `.claude/valider.sh` sjekker nå også filer endret i Bash
+  (sed, skript): JSON/GeoJSON/Python som git ser som endret siden forrige godkjenning, og melder en ødelagt fil til den er rettet.
+  Stop-hooken `sky-push.sh` har `onFailure: block`. CLAUDE.md: vent med `gh run watch` før skjermbilder av forhåndsvisningen,
+  og kjør axe-core ved UI-endringer. `/doctor prompt-audit` er kjørt på reglene og funnene er rettet. Ferdig flettede lokale grener er slettet.
+  Ingen axe-brudd på forsiden. Dokumentasjonen bruker port 8002 for lokal server. Hooks: PR #20.
 - 4.11.: Claude-oppsett. `.claude/launch.json` lar Claude-appen starte serveren i den innebygde nettleseren (8000 byguider,
   8001 reiseplanlegging, 8002 stam.pe). Hooks: `.claude/oppstart.sh` sjekker ved oppstart om repoet ligger bak eller foran origin
   (henter selv når det er trygt) og om /avslutt avviker fra claude-oppsett; `.claude/valider.sh` sjekker JSON/GeoJSON/Python
@@ -35,6 +40,8 @@ Sist oppdatert: 4. november 2026.
 
 ## Neste steg
 
+- Miniatyren `bilder/reiseplanlegging-mork.webp` er tatt før «best» fikk mørkere grønn i mørk modus (reiseplanlegging #30).
+  Forskjellen er knapt synlig; ta den på nytt neste gang miniatyrene oppdateres.
 - Ingen planlagte endringer. Når en ny app kommer: oppslag i index.html og 404.html (og kopi av 404.html i alle app-repoene,
   også det nye), snarvei i manifestet,
   `UNNTAK` i sw.js hvis den har egen service worker, miniatyr i lys og mørk utgave, eventuelt nytt delingsbilde, og eget delingskort og frimerke-ikon i appen
@@ -53,6 +60,8 @@ Sist oppdatert: 4. november 2026.
 
 ## Beslutningslogg
 
+- 2026-11-04: valider.sh kjører også etter Bash, siden auto mode ofte endrer filer med sed og skript, som før gikk utenom sjekken.
+- 2026-11-04: UI-endringer sjekkes med axe-core (lys og mørk) før fletting. Brudd som krever nye farger tas med Pål.
 - 2026-11-04: Claude kjører /code-review og /simplify selv før fletting av kodeendringer, så Pål slipper å be om det.
 - 2026-11-04: Git-sjekk ved oppstart og push-vakt i sky ligger som hooks i repoet (ikke bare som regel), så de virker både lokalt og i skyøkter.
 - 2026-11-01: Et ikon eller delingsbilde som byttes, får nytt filnavn. iOS lagrer ikoner etter adresse og viste det gamle
