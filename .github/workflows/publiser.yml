@@ -1,0 +1,112 @@
+# Felles publisering på GitHub Pages for stam.pe, byguider og reiseplanlegging.
+# Hvert repo har en kort .github/workflows/pages.yml som kaller denne:
+#   main                -> stam.pe/<repo>/ (stam.pe/ for dette repoet)
+#   alle andre grener   -> …/forhandsvisning/<gren>/
+#
+# Endres denne, gjelder det alle tre repoene fra neste kjøring (de bruker @main).
+# Krever Settings -> Pages -> Source: «GitHub Actions» i hvert repo.
+#
+# GitHub lar bare main publisere til Pages. En push til en annen gren publiserer derfor
+# ikke selv, men starter pages.yml på main, som så samler main og alle grener og
+# publiserer alt samlet. Har repoet .github/etter-sammensetting.sh, kjøres det med
+# mappa som publiseres (byguider lager delingssidene per sted der).
+
+name: Publiser (felles)
+
+on:
+  workflow_call:
+
+jobs:
+  utlos:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Start publisering fra main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
+
+  publiser:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Kjøringer står i kø i stedet for å avbryte hverandre. En avbrutt kjøring stopper ikke
+    # opplastingen hos Pages, og da feiler den neste med «in progress deployment»
+    # (skjedde i byguider 28.10.). Den siste i køen publiserer origin/main slik den er da.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      deployments: read   # ryddingen finner publiseringene som henger
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # Avbryter Pages-publiseringer som henger. Kjøringene står i kø (concurrency: pages), så ingen
+      # annen kjøring publiserer nå: alt Pages fortsatt regner som pågående, er rester.
+      # Tom status betyr at Pages ikke lenger følger publiseringen.
+      RYDD: |
+        set -uo pipefail
+        shaer=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=github-pages&per_page=30" --jq '.[].sha' | sort -u) \
+          || echo "Fant ikke publiseringene (se feilen over); prøver uten å rydde"
+        for sha in $shaer; do
+          status=$(gh api "repos/$GITHUB_REPOSITORY/pages/deployments/$sha" --jq .status 2>/dev/null) || continue
+          case "$status" in
+            ''|succeed|deployment_failed|deployment_cancelled|deployment_content_failed|deployment_attempt_error|deployment_lost) ;;
+            *)
+              echo "Avbryter publisering av $sha (status: $status)"
+              gh api -X POST "repos/$GITHUB_REPOSITORY/pages/deployments/$sha/cancel" >/dev/null || echo "Klarte ikke å avbryte $sha"
+              ;;
+          esac
+        done
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sett sammen main og forhåndsvisninger
+        run: |
+          mkdir -p _site
+          git archive origin/main | tar -x -C _site
+          for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/); do
+            gren="${ref#origin/}"
+            case "$gren" in main|HEAD|origin) continue ;; esac
+            mkdir -p "_site/forhandsvisning/$gren"
+            git archive "$ref" | tar -x -C "_site/forhandsvisning/$gren"
+            echo "Forhåndsvisning: $gren"
+          done
+          if [ -f .github/etter-sammensetting.sh ]; then bash .github/etter-sammensetting.sh _site; fi
+          rm -rf _site/.github
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      # Pages kan regne forrige publisering som pågående lenge etter at den kjøringen er ferdig
+      # (28.10., og 18+ minutter 4.11.), og avviser da med «in progress deployment», eller
+      # publiseringen henger til tidsavbruddet (10 min). Derfor avbryter vi det som henger før
+      # hvert forsøk, venter 5 minutter mellom forsøkene, og prøver opptil tre ganger i alt.
+      - name: Rydd før første forsøk
+        run: bash -c "$RYDD" || true   # ryddingen skal aldri stoppe publiseringen
+      - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Rydd og vent før forsøk 2
+        if: steps.deploy.outcome == 'failure'
+        run: bash -c "$RYDD" || true; sleep 300
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Rydd og vent før forsøk 3
+        if: steps.deploy2.outcome == 'failure'
+        run: bash -c "$RYDD" || true; sleep 300
+      - id: deploy3
+        if: steps.deploy2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
