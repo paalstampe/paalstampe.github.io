@@ -28,7 +28,7 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   `gh run watch $(gh run list --commit $(git rev-parse HEAD) -L1 --json databaseId -q '.[0].databaseId') --exit-status`
   (kjøringen dukker opp noen sekunder etter push).
 - Sjekk designet selv: .claude/skjermbilde.sh <url> <fil.png> 390 844 (mobil) og 1300 900 (desktop);
-  legg til «hel» for hele siden. Tillatt: https://stam.pe/... og http://localhost:<port>/... (eller 127.0.0.1)
+  legg til «hel» for hele siden og «mork» for mørk modus. Tillatt: https://stam.pe/... og http://localhost:<port>/... (eller 127.0.0.1)
   (kjør python3 -m http.server 8002 --bind 127.0.0.1 først — gir rask sjekk før push). Virker i skyen og på Macen;
   på Macen kreves Node og Playwright (installasjon øverst i skriptet).
 - Sjekk begge språk (?lang=en) når du endrer tekst eller layout.
