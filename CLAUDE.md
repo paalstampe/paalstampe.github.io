@@ -32,6 +32,8 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   (kjør python3 -m http.server 8000 --bind 127.0.0.1 først — gir rask sjekk før push). Virker i skyen og på Macen;
   på Macen kreves Node og Playwright (installasjon øverst i skriptet).
 - Sjekk begge språk (?lang=en) når du endrer tekst eller layout.
+- UI-endringer: kjør axe-core i nettleserpanelet før fletting (last https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js
+  med javascript_tool, så `axe.run()`), i lys og mørk modus. Rett brudd; kontrast som krever nye farger tas med Pål.
 - Før fletting av kodeendringer: kjør /code-review (standardnivå) og /simplify på grenen selv, uten at Pål ber om det.
   Rett funnene som holder, nevn kort i PR-beskrivelsen hva som ble funnet og rettet. Gjelder ikke rene data- og tekstendringer.
 - Fletting: Kan du selv verifisere at alt er i orden (skjermbilder mobil + desktop, begge språk, ingen JS-feil),
