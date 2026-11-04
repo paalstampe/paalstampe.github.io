@@ -51,6 +51,9 @@ jobs:
       # annen kjøring publiserer nå: alt Pages fortsatt regner som pågående, er rester.
       # Går fra nyeste til den siste som lyktes; eldre er erstattet av den og kan ikke blokkere
       # (de kan bli stående som f.eks. purging_cdn). Tom status: Pages følger ikke lenger publiseringen.
+      # Ferdige («succeed») kan ikke avbrytes, selv når Pages sier de blokkerer; da hjelper bare venting.
+      # Tørrkjøring lokalt (avbryter ingenting):
+      #   RYDD_TORR=1 GITHUB_REPOSITORY=paalstampe/<repo> bash -c "$(python3 -c "import yaml;print(yaml.safe_load(open('.github/workflows/publiser.yml'))['jobs']['publiser']['env']['RYDD'])")"
       RYDD: |
         set -uo pipefail
         shaer=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=github-pages&per_page=30" --jq '.[].sha' | awk '!sett[$0]++') \
@@ -62,7 +65,8 @@ jobs:
             ''|deployment_failed|deployment_cancelled|deployment_content_failed|deployment_attempt_error|deployment_lost) ;;
             *)
               echo "Avbryter publisering av $sha (status: $status)"
-              gh api -X POST "repos/$GITHUB_REPOSITORY/pages/deployments/$sha/cancel" >/dev/null || echo "Klarte ikke å avbryte $sha"
+              if [ -n "${RYDD_TORR:-}" ]; then echo "  (tørrkjøring: avbryter ikke)"
+              elif ! gh api -X POST "repos/$GITHUB_REPOSITORY/pages/deployments/$sha/cancel" >/dev/null; then echo "Klarte ikke å avbryte $sha"; fi
               ;;
           esac
         done
