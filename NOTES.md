@@ -5,7 +5,10 @@ Oppdateres ved slutten av hver økt (`/avslutt`).
 
 ## Status nå
 
-Sist oppdatert: 1. november 2026.
+Sist oppdatert: 4. november 2026.
+
+- 4.11.: miniatyrene av reiseplanleggingen (lys og mørk) er tatt på nytt. Kartet går nå rundt jorda og fyller hele
+  bredden (reiseplanlegging #21).
 
 - 1.11.: ved deling fra forsiden på iPhone dukket byguidenes gamle «b»-ikon opp. Det ble byttet ut 31.10. under samme filnavn,
   og iOS hadde den gamle versjonen lagret. App-ene bruker nå `ikon-frimerke.png` (byguider #90, reiseplanlegging #20), og
