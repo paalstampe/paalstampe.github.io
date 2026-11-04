@@ -49,15 +49,17 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       # Avbryter Pages-publiseringer som henger. Kjøringene står i kø (concurrency: pages), så ingen
       # annen kjøring publiserer nå: alt Pages fortsatt regner som pågående, er rester.
-      # Tom status betyr at Pages ikke lenger følger publiseringen.
+      # Går fra nyeste til den siste som lyktes; eldre er erstattet av den og kan ikke blokkere
+      # (de kan bli stående som f.eks. purging_cdn). Tom status: Pages følger ikke lenger publiseringen.
       RYDD: |
         set -uo pipefail
-        shaer=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=github-pages&per_page=30" --jq '.[].sha' | sort -u) \
+        shaer=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=github-pages&per_page=30" --jq '.[].sha' | awk '!sett[$0]++') \
           || echo "Fant ikke publiseringene (se feilen over); prøver uten å rydde"
         for sha in $shaer; do
           status=$(gh api "repos/$GITHUB_REPOSITORY/pages/deployments/$sha" --jq .status 2>/dev/null) || continue
           case "$status" in
-            ''|succeed|deployment_failed|deployment_cancelled|deployment_content_failed|deployment_attempt_error|deployment_lost) ;;
+            succeed) break ;;
+            ''|deployment_failed|deployment_cancelled|deployment_content_failed|deployment_attempt_error|deployment_lost) ;;
             *)
               echo "Avbryter publisering av $sha (status: $status)"
               gh api -X POST "repos/$GITHUB_REPOSITORY/pages/deployments/$sha/cancel" >/dev/null || echo "Klarte ikke å avbryte $sha"
