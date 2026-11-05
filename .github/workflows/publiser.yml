@@ -77,21 +77,19 @@ jobs:
 
       - name: Sett sammen main og forhåndsvisninger
         run: |
-          # Dokumentasjon og Claude-oppsett hører til repoet, ikke nettsiden (også i forhåndsvisningene).
-          # Da gir en commit som bare endrer dokumentasjon ingen ny publisering. Byguidenes data/*.md publiseres.
-          uten_dokumentasjon() { (cd "$1" && rm -rf .claude .github CLAUDE.md NOTES.md HANDOVER.md SMAK.md README.md); }
+          # git archive tar ikke med filene hvert repo har merket export-ignore i .gitattributes
+          # (dokumentasjon og Claude-oppsett), så en commit som bare endrer dem gir ingen ny publisering.
           mkdir -p _site
           git archive origin/main | tar -x -C _site
-          uten_dokumentasjon _site
           for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/); do
             gren="${ref#origin/}"
             case "$gren" in main|HEAD|origin) continue ;; esac
             mkdir -p "_site/forhandsvisning/$gren"
             git archive "$ref" | tar -x -C "_site/forhandsvisning/$gren"
-            uten_dokumentasjon "_site/forhandsvisning/$gren"
             echo "Forhåndsvisning: $gren"
           done
           if [ -f .github/etter-sammensetting.sh ]; then bash .github/etter-sammensetting.sh _site; fi
+          rm -rf _site/.github   # for repoer uten .gitattributes
           touch _site/.nojekyll
 
       - id: pages
