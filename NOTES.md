@@ -54,9 +54,9 @@ Sist oppdatert: 5. november 2026.
   alle filene ligger som `publisert.txt` og sammenlignes. Verifisert: første kjøring publiserte og neste hoppet over, i alle tre;
   ved fletting publiserte push-kjøringen og sletting av grenen hoppet over. Pages kan likevel henge på én enkelt publisering:
   4.11. kl. 22:20 tidsavbrøt alle tre forsøkene på stam.pe (en NOTES-commit). Fikk dette ofte, er neste skritt lengre ventetid.
-- Mulig: hold dokumentasjonen (CLAUDE.md, NOTES.md, HANDOVER.md, SMAK.md, .claude/) utenfor nettsiden. Den publiseres i dag
-  (f.eks. stam.pe/NOTES.md), så hver NOTES-commit gir en ny publisering. Repoene er offentlige, så det er ingen hemmelighet.
-  OBS: byguiders data/*.md må publiseres.
+- Dokumentasjon og Claude-oppsett (CLAUDE.md, NOTES.md, HANDOVER.md, SMAK.md, README.md, .claude/, .github/) publiseres ikke
+  lenger, heller ikke i forhåndsvisningene (paalstampe.github.io #27, 5.11.). En commit som bare endrer dokumentasjon gir da ingen
+  ny publisering. Byguidenes data/*.md publiseres som før. Ny dokumentasjonsfil: legg navnet inn i `uten_dokumentasjon` i publiser.yml.
 - Miniatyren `bilder/reiseplanlegging-mork.webp` er tatt før «best» fikk mørkere grønn i mørk modus (reiseplanlegging #30).
   Forskjellen er knapt synlig; ta den på nytt neste gang miniatyrene oppdateres.
 - Ingen planlagte endringer. Når en ny app kommer: oppslag i index.html og 404.html (og kopi av 404.html i alle app-repoene,
@@ -74,6 +74,8 @@ Sist oppdatert: 5. november 2026.
 
 ## Beslutningslogg
 
+- 2026-11-05: Dokumentasjonen publiseres ikke. Det er ikke for å skjule noe (repoene er offentlige), men så commits som bare
+  endrer dokumentasjon ikke gir nye publiseringer, som er det som henger hos Pages.
 - 2026-11-05: Publiseringen hopper over når innholdet er likt det som er ute (avtrykk i `publisert.txt`). Gjentatte
   publiseringer av samme innhold var det som oftest hang hos Pages 4.11.
 - 2026-11-04: Publiseringen rydder Pages-publiseringer som henger og prøver tre ganger med 5 min pause. Ferdige publiseringer
