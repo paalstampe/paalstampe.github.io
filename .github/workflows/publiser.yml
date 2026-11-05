@@ -100,7 +100,7 @@ jobs:
         id: endret
         run: |
           avtrykk=$(cd _site && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
-          ute=$(curl -fsS "${{ steps.pages.outputs.base_url }}/publisert.txt?v=$GITHUB_RUN_ID" 2>/dev/null || true)
+          ute=$(curl -fsS -H "Cache-Control: no-cache" "${{ steps.pages.outputs.base_url }}/publisert.txt?v=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" 2>/dev/null || true)
           echo "$avtrykk" > _site/publisert.txt
           if [ "$ute" = "$avtrykk" ]; then
             echo "Uendret siden forrige publisering ($avtrykk), hopper over."
