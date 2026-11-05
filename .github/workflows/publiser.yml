@@ -90,8 +90,27 @@ jobs:
           rm -rf _site/.github
           touch _site/.nojekyll
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - id: pages
+        uses: actions/configure-pages@v5
+      # Hopper over publiseringen når innholdet er det samme som det som ligger ute. En fletting gir ofte
+      # flere kjøringer med samme innhold (push, sletting av grenen, start fra grenen), og 4.11. var det
+      # nettopp slike gjentatte publiseringer som ble hengende hos Pages. Fingeravtrykket av alle filene
+      # publiseres som publisert.txt og sammenlignes med det som ligger ute (?v= omgår mellomlageret).
+      - name: Er innholdet endret?
+        id: endret
+        run: |
+          avtrykk=$(cd _site && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          ute=$(curl -fsS -H "Cache-Control: no-cache" "${{ steps.pages.outputs.base_url }}/publisert.txt?v=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" 2>/dev/null || true)
+          echo "$avtrykk" > _site/publisert.txt
+          if [ "$ute" = "$avtrykk" ]; then
+            echo "Uendret siden forrige publisering ($avtrykk), hopper over."
+            echo "publiser=nei" >> "$GITHUB_OUTPUT"
+          else
+            echo "Endret (ute: ${ute:-ingen}, nå: $avtrykk)."
+            echo "publiser=ja" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.endret.outputs.publiser == 'ja'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: _site
       # Pages kan regne forrige publisering som pågående lenge etter at den kjøringen er ferdig
@@ -99,8 +118,10 @@ jobs:
       # publiseringen henger til tidsavbruddet (10 min). Derfor avbryter vi det som henger før
       # hvert forsøk, venter 5 minutter mellom forsøkene, og prøver opptil tre ganger i alt.
       - name: Rydd før første forsøk
+        if: steps.endret.outputs.publiser == 'ja'
         run: bash -c "$RYDD" || true   # ryddingen skal aldri stoppe publiseringen
       - id: deploy
+        if: steps.endret.outputs.publiser == 'ja'
         uses: actions/deploy-pages@v4
         continue-on-error: true
       - name: Rydd og vent før forsøk 2
