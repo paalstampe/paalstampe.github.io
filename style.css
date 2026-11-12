@@ -150,9 +150,11 @@ html, body {
   transition: padding 0.15s;
 }
 
-.oppslag:hover { padding-left: 10px; }
-.oppslag:hover .oppslag-navn,
-.oppslag:hover .pil { color: var(--aksent); }
+@media (hover: hover) and (pointer: fine) {
+  .oppslag:hover { padding-left: 10px; }
+  .oppslag:hover .oppslag-navn,
+  .oppslag:hover .pil { color: var(--aksent); }
+}
 .oppslag:focus-visible { outline: 2px solid var(--aksent); outline-offset: 4px; }
 
 /* Miniatyr av app-ens åpningsside, 4:3. */
@@ -251,15 +253,34 @@ html, body {
 
 .lenkeknapp:disabled { color: var(--dempet); text-decoration: none; cursor: default; }
 
-/* ---------- Mobil ---------- */
+/* ---------- Mobil og liggende mobil ---------- */
+
+/* Kompakte oppslag: små miniatyrer og større trykkflate i språkvalget. */
+@media (max-width: 600px), (orientation: landscape) and (max-height: 500px) {
+  .oppslag { gap: 0 14px; align-items: start; }
+  .miniatyr { width: 76px; height: 57px; margin-top: 4px; }
+  .oppslag:hover { padding-left: 0; }
+  .sprakvalg button { padding: 6px 5px 3px; }
+}
 
 @media (max-width: 600px) {
   .side { padding: 48px 20px 32px; }
   .tittel { font-size: 40px; }
-  .oppslag { grid-template-columns: 76px 1fr auto; gap: 0 14px; align-items: start; }
-  .miniatyr { width: 76px; height: 57px; margin-top: 4px; }
+  .oppslag { grid-template-columns: 76px 1fr auto; }
   .pil { align-self: center; }
   .oppslag-navn { font-size: 25px; }
-  .oppslag:hover { padding-left: 0; }
-  .sprakvalg button { padding: 6px 5px 3px; }   /* større trykkflate */
+}
+
+/* Liggende mobil: lav og bred skjerm (samme spørring som i byguidene). Appene i to kolonner og et
+   lavere hode, så begge appene synes på første skjerm. Desktop beholder én kolonne. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .side { max-width: 900px; padding: 28px 32px; }
+  .hode { padding-bottom: 20px; }
+  .tittel { font-size: 36px; }
+  .ingress { margin-top: 8px; max-width: none; }
+  .liste { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-content: start; }
+  .oppslag { grid-template-columns: 76px 1fr; padding: 18px 0 20px; }
+  .oppslag-navn { font-size: 24px; }
+  .oppslag-notat { font-size: 13.5px; }
+  .pil { display: none; }
 }
