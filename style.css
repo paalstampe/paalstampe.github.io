@@ -263,3 +263,22 @@ html, body {
   .oppslag:hover { padding-left: 0; }
   .sprakvalg button { padding: 6px 5px 3px; }   /* større trykkflate */
 }
+
+/* ---------- Liggende mobil ----------
+   Lav og bred skjerm (samme spørring som i byguidene). Appene i to kolonner med den kompakte
+   mobilvarianten og et lavere hode, så begge appene synes på første skjerm. Desktop beholder én kolonne. */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .side { max-width: 900px; padding: 28px 32px 28px; }
+  .hode { padding-bottom: 20px; }
+  .tittel { font-size: 36px; }
+  .ingress { margin-top: 8px; max-width: none; }
+  .liste { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-content: start; }
+  .oppslag { grid-template-columns: 76px 1fr; gap: 0 14px; align-items: start; padding: 18px 0 20px; }
+  .miniatyr { width: 76px; height: 57px; margin-top: 4px; }
+  .oppslag-navn { font-size: 24px; }
+  .oppslag-notat { font-size: 13.5px; }
+  .oppslag:hover { padding-left: 0; }
+  .pil { display: none; }
+  .sprakvalg button { padding: 6px 5px 3px; }
+}
