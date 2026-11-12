@@ -29,7 +29,8 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   som henger og prøver tre ganger. Filer som ikke skal på nettsiden (dokumentasjon, .claude/), merkes `export-ignore` i `.gitattributes`.
 - Etter push av en gren: vent på publiseringen før skjermbilder av forhåndsvisningen, i bakgrunnen med
   `gh run watch $(gh run list --commit $(git rev-parse HEAD) -L1 --json databaseId -q '.[0].databaseId') --exit-status`
-  (kjøringen dukker opp noen sekunder etter push).
+  (kjøringen dukker opp noen sekunder etter push). Forhåndsvisningen kan gi 404 i opptil et halvt minutt etter at
+  kjøringen er ferdig; sjekk med curl at den svarer 200 før skjermbilder.
 - Sjekk designet selv: .claude/skjermbilde.sh <url> <fil.png> 390 844 (mobil) og 1300 900 (desktop);
   legg til «hel» for hele siden og «mork» for mørk modus. Tillatt: https://stam.pe/... og http://localhost:<port>/... (eller 127.0.0.1)
   (kjør python3 -m http.server 8002 --bind 127.0.0.1 først — gir rask sjekk før push). Virker i skyen og på Macen;
