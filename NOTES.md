@@ -5,8 +5,10 @@ Oppdateres ved slutten av hver økt (`/avslutt`). Eldre status og beslutninger: 
 
 ## Status nå
 
-Sist oppdatert: 12. november 2026.
+Sist oppdatert: 13. november 2026.
 
+- 13.11.: `.claude/axe.sh <url> [bredde høyde] [js=<kode>]` kjører axe-core via Playwright i lys og mørk modus (felles fil fra
+  claude-oppsett, synkes som hookene). Erstatter axe i nettleserpanelet, som auto-modus avviste. Ingen brudd ved første kjøring.
 - 12.11.: når telefonen ligger (liggende og under 500 px høy, samme spørring som i byguidene), står appene i to kolonner
   med kompakte oppslag og lavere hode, så begge synes på første skjerm. Gjelder også 404-siden. Stående mobil og desktop er
   uendret. De kompakte reglene deles nå av mobil og liggende, og hover-forskyvningen gjelder bare med mus (PR #33).
