@@ -337,12 +337,12 @@ async function lagreReise(adresser) {
   } catch (e) { return T.reiseKort + ': ' + (e && e.message || e); }
 }
 
-/* Byguidene: alle byene, med kart. Gir null når alt er lagret, ellers en feiltekst. */
+/* Byguidene: alle byene på lista (ikke «kommer» eller «skjult»), med kart. Gir null når alt er lagret, ellers en feiltekst. */
 async function lagreByguider(adresser, merknad) {
   const T = () => TEKST[sprak];
   try {
     const byer = ((await (await fetch(BYGUIDER + 'byer.json', { cache: 'no-store' })).json()).byer || [])
-      .filter(b => b.status !== 'kommer');
+      .filter(b => b.status !== 'kommer' && !b.skjult);   // som lista i byguidene
     skrivLager('stampe-byguider-byer', JSON.stringify(byer.map(b => b.id)));
     const navn = id => { const b = byer.find(x => x.id === id) || {}; return (sprak === 'en' && b.navn_en) || b.navn || id; };
     merknad.textContent = T().lagrerBy(navn(byer[0].id), 0, 1, byer.length);
