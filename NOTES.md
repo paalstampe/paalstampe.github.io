@@ -7,6 +7,8 @@ Oppdateres ved slutten av hver økt (`/avslutt`). Eldre status og beslutninger: 
 
 Sist oppdatert: 13. november 2026.
 
+- 13.11.: «Lagre alt for bruk offline» lagrer bare byene på lista i byguidene, ikke dem med `skjult: true` (Kairo, Luxor,
+  Berlin, Mexico City) (PR #36). Allerede lagrede skjulte byer blir liggende til «Slett».
 - 13.11.: `.claude/axe.sh <url> [bredde høyde] [js=<kode>]` kjører axe-core via Playwright i lys og mørk modus (felles fil fra
   claude-oppsett, synkes som hookene). Erstatter axe i nettleserpanelet, som auto-modus avviste. Ingen brudd ved første kjøring.
 - 12.11.: når telefonen ligger (liggende og under 500 px høy, samme spørring som i byguidene), står appene i to kolonner
@@ -19,7 +21,7 @@ Sist oppdatert: 13. november 2026.
 - På plass: hjemskjermikon (PS-frimerke) og manifest med snarveier, delingsbilde og 404-side.
   «Lagre alt for bruk offline» viser plassbruk og har sletting. Siden er ikke søkbar
   (noindex og robots.txt), og mørk modus har mørke miniatyrer.
-- Siste kodeendring her: to kolonner på liggende mobil (PR #33, 12.11.). Ingen åpne grener utenom `main`.
+- Siste kodeendring her: offline uten skjulte byer (PR #36, 13.11.). Ingen åpne grener utenom `main`.
 
 ## Neste steg
 
@@ -52,6 +54,8 @@ Sist oppdatert: 13. november 2026.
 
 ## Beslutningslogg
 
+- 2026-11-13: Offline-lagringen fra forsiden følger lista i byguidene (hopper over `skjult` og `kommer`). Skjulte byer
+  er uferdige og skal ikke ta plass på enheten; guiden virker fortsatt på nett.
 - 2026-11-12: Liggende mobil får appene i to kolonner, desktop beholder én. Liggende er høyden det knappe, og med to apper
   stod den andre under kanten. På desktop er det nok høyde, og beskrivelsene leses bedre i full bredde. Vurder to kolonner
   på desktop også når det kommer flere apper.
