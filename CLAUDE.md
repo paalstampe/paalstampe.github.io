@@ -28,7 +28,7 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   paalstampe.github.io (endres der, gjelder alle tre). Den hopper over uendret innhold (`publisert.txt`), rydder Pages-publiseringer
   som henger og prøver tre ganger. Filer som ikke skal på nettsiden (dokumentasjon, .claude/), merkes `export-ignore` i `.gitattributes`.
 - Etter push av en gren: vent på publiseringen før skjermbilder av forhåndsvisningen, i bakgrunnen med
-  `gh run watch $(gh run list --commit $(git rev-parse HEAD) -L1 --json databaseId -q '.[0].databaseId') --exit-status`
+  `.claude/vent-publisering.sh` (venter på alle kjøringene for HEAD og ser bort fra dem som ble avbrutt; gjelder også etter fletting til main)
   (kjøringen dukker opp noen sekunder etter push). Forhåndsvisningen kan gi 404 i opptil et halvt minutt etter at
   kjøringen er ferdig; sjekk med curl at den svarer 200 før skjermbilder.
 - Sjekk designet selv: .claude/skjermbilde.sh <url> <fil.png> 390 844 (mobil) og 1300 900 (desktop);
