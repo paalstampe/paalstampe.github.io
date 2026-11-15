@@ -29,7 +29,7 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
   som henger og prøver tre ganger. Filer som ikke skal på nettsiden (dokumentasjon, .claude/), merkes `export-ignore` i `.gitattributes`.
 - Etter push av en gren: vent på publiseringen før skjermbilder av forhåndsvisningen, i bakgrunnen med
   `.claude/vent-publisering.sh` (venter på alle kjøringene for HEAD og ser bort fra dem som ble avbrutt; gjelder også etter fletting til main)
-  (kjøringen dukker opp noen sekunder etter push). Forhåndsvisningen kan gi 404 i opptil et halvt minutt etter at
+  Forhåndsvisningen kan gi 404 i opptil et halvt minutt etter at
   kjøringen er ferdig; sjekk med curl at den svarer 200 før skjermbilder.
 - Sjekk designet selv: .claude/skjermbilde.sh <url> <fil.png> 390 844 (mobil) og 1300 900 (desktop);
   legg til «hel» for hele siden og «mork» for mørk modus. Tillatt: https://stam.pe/... og http://localhost:<port>/... (eller 127.0.0.1)
