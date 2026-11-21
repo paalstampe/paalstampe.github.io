@@ -5,7 +5,9 @@ Oppdateres ved slutten av hver økt (`/avslutt`). Eldre status og beslutninger: 
 
 ## Status nå
 
-Sist oppdatert: 13. november 2026.
+Sist oppdatert: 21. november 2026.
+
+- 21.11.: `.claude/plattformtest.sh` (felles skript fra claude-oppsett) simulerer Android og Windows; forsiden besto alle sjekkene.
 
 - 13.11.: «Lagre alt for bruk offline» lagrer bare byene på lista i byguidene, ikke dem med `skjult: true` (Kairo, Luxor,
   Berlin, Mexico City) (PR #36). Allerede lagrede skjulte byer blir liggende til «Slett».
