@@ -38,6 +38,8 @@ Hold HANDOVER.md oppdatert når noe vesentlig endres i oppsettet.
 - Sjekk begge språk (?lang=en) når du endrer tekst eller layout.
 - UI-endringer: kjør `.claude/axe.sh <url> [bredde høyde]` før fletting (axe-core via Playwright, lys og mørk modus;
   f.eks. http://localhost:8002/ i 1300 900 og 390 844). Rett brudd; kontrast som krever nye farger tas med Pål.
+- Android/Windows: `.claude/plattformtest.sh <url>` simulerer Android-telefoner og -nettbrett og Windows (faste rullefelt) i Chromium.
+  Kjør ved layoutendringer. Ekte enheter og Firefox dekkes ikke.
 - Før fletting av kodeendringer: kjør /code-review (standardnivå) og /simplify på grenen selv, uten at Pål ber om det.
   Rett funnene som holder, nevn kort i PR-beskrivelsen hva som ble funnet og rettet. Gjelder ikke rene data- og tekstendringer.
 - Fletting: Kan du selv verifisere at alt er i orden (skjermbilder mobil + desktop, begge språk, ingen JS-feil),
